@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class Main {
+	// BALRHGINGKHGLSJLDS Behl.
     public static void main(String[] args) {
         String grammar = args[0];
         String input = args[1];
