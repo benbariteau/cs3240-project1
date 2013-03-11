@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -10,7 +11,7 @@ public class Main {
 	
 	private static Map<String, String> mapClasses, mapTokens;
 	private static String pathToGrammar, pathToInput;
-	
+	private static ArrayList<String> lines;
 	/*
 	 * Main method and driver of the program
 	 * @arg[0]	Grammar
@@ -33,6 +34,7 @@ public class Main {
         parseTokens(scannerGrammar, pattern);
         
         // TODO - input the input file
+        readInput(scan(pathToInput));
     }
 
     /*
@@ -122,6 +124,23 @@ public class Main {
         Pattern initialWhitespace = Pattern.compile("^\\s+");
         Matcher whitespaceMatcher = initialWhitespace.matcher(substring);
         return whitespaceMatcher.replaceAll("");
+    }
+    
+    private static void readInput(Scanner in)
+    {
+    	lines = new ArrayList<String>();
+    	while(in.hasNext())
+    	{
+    		lines.add(in.nextLine());
+    	}
+
+    	
+    	//Print out Input File
+    	System.out.println("\nInput File:");
+    	for(String s:lines)
+    	{
+    		System.out.println(s);
+    	}
     }
     
 }
