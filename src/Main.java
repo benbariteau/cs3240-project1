@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 
 public class Main {
 	
+	
+	
 	/*
 	 * Main method and driver of the program
 	 * @arg[0]	Grammar
@@ -20,9 +22,10 @@ public class Main {
             System.exit(-1);
         }
 
+        // The two file paths (grammar and input file respectively)
         String grammar = args[0];
         String input = args[1];
-
+        
         // Input the grammar file
         Scanner scanner = null;
         try {
@@ -32,7 +35,16 @@ public class Main {
             System.exit(-1);
         }
 
-        // HashMap of classes and their class type
+        // Parse the classes and then the tokens
+        Pattern pattern = parseClasses(scanner);
+        parseTokens(scanner, pattern);
+    }
+
+    /*
+     * Iterates over the lines of the grammar file for classes (before the line break)
+     */
+	private static Pattern parseClasses(Scanner scanner) {
+		// HashMap of classes and their class type
         Map<String, String> characterClasses = new HashMap<String, String>();
 
         // Parse for character classes in grammar file
@@ -56,8 +68,14 @@ public class Main {
             System.out.println("{" + key + ", " + characterClasses.get(key) +"}");
         }
         System.out.println();
+		return pattern;
+	}
 
-        // HashMap of tokens and their token type
+	/*
+	 * Iterates over the grammar file after the line break (so for tokens)
+	 */
+	private static void parseTokens(Scanner scanner, Pattern pattern) {
+		// HashMap of tokens and their token type
         Map<String, String> tokens = new HashMap<String, String>();
 
         // Parse for character tokens
@@ -75,7 +93,7 @@ public class Main {
         for(String key : tokens.keySet()) {
             System.out.println("{" + key + ", " + tokens.get(key) +"}");
         }
-    }
+	}
 
     /*
      * Removes all whitespace from a string
