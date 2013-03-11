@@ -35,13 +35,32 @@ public class Main {
             Pattern pattern = Pattern.compile("\\$\\S+");
             Matcher matcher = pattern.matcher(line);
             matcher.find();
-            String token = matcher.group(0);
+            String charClass = matcher.group(0);
             String rest = line.substring(matcher.end());
-            characterClasses.put(token, rest);
+            characterClasses.put(charClass, rest);
         }
 
+        System.out.println("Character Classes");
         for(String key : characterClasses.keySet()) {
             System.out.println("{" + key + ", " + characterClasses.get(key) +"}");
+        }
+        System.out.println();
+
+        Map<String, String> tokens = new HashMap<String, String>();
+
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            Pattern pattern = Pattern.compile("\\$\\S+");
+            Matcher matcher = pattern.matcher(line);
+            matcher.find();
+            String token = matcher.group(0);
+            String rest = line.substring(matcher.end());
+            tokens.put(token, rest);
+        }
+
+        System.out.println("Tokens");
+        for(String key : tokens.keySet()) {
+            System.out.println("{" + key + ", " + tokens.get(key) +"}");
         }
     }
 }
