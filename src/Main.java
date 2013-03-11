@@ -8,7 +8,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Main {
-	// Why you have problems? I no have problems.
     public static void main(String[] args) {
         if (args.length < 2) {
             System.out.println("Usage: java Main path/to/grammar path/to/input");
@@ -26,23 +25,23 @@ public class Main {
             System.exit(-1);
         }
 
-        Map<String, String> tokens = new HashMap<String, String>();
+        Map<String, String> characterClasses = new HashMap<String, String>();
 
         while(scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            if (line.contentEquals("\n")) {
+            if (line.trim().equals("")) {
                 break;
             }
-            System.out.println(line);
-            Pattern pattern = Pattern.compile("\\$[A-Z]+");
+            Pattern pattern = Pattern.compile("\\$\\S+");
             Matcher matcher = pattern.matcher(line);
-            String token = matcher.group();
+            matcher.find();
+            String token = matcher.group(0);
             String rest = line.substring(matcher.end());
-            tokens.put(token, rest);
+            characterClasses.put(token, rest);
         }
 
-        for(String key : tokens.keySet()) {
-            System.out.println("{" + key + ", " + tokens.get(key) +"}");
+        for(String key : characterClasses.keySet()) {
+            System.out.println("{" + key + ", " + characterClasses.get(key) +"}");
         }
     }
 }
