@@ -83,7 +83,7 @@ public class Main {
         }
 
         // Output all the character classes that we just scanned
-        System.out.println("Character Classes");
+        System.out.println("Character Classes:");
         for(String key : mapClasses.keySet()) {
             System.out.println("{" + key + ", " + mapClasses.get(key) +"}");
         }
@@ -109,7 +109,7 @@ public class Main {
         }
 
         // Output all the character tokens that we just scanned
-        System.out.println("Tokens");
+        System.out.println("Tokens:");
         for(String key : mapTokens.keySet()) {
             System.out.println("{" + key + ", " + mapTokens.get(key) +"}");
         }
