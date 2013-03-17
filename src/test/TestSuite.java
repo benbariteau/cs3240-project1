@@ -24,11 +24,10 @@ public class TestSuite {
 
 	/*
 	 * The list of parameter groups to use for the tests
-	 * set1 is the samples given out on T-Square
-	 * set2 is a set with a simple grammar and a simple input
-	 * set3 is a set with a simple grammar but a complex input
-	 * set4 is a set with a complex grammar but a simple input
-	 * set5 is a set with a complex grammar and a complex input
+	 * set1 is a set with a simple grammar and a simple input
+	 * set2 is a set with a simple grammar but a complex input
+	 * set3 is a set with a complex grammar but a simple input
+	 * set4 is a set with a complex grammar and a complex input (T-Square sample)
 	 * 
 	 */
 	@Parameters
@@ -37,8 +36,7 @@ public class TestSuite {
 				{ "resources/set1/SampleGrammar", "resources/set1/SampleInput", "resources/set1/SampleOutput" },
 				{ "resources/set2/SampleGrammar", "resources/set2/SampleInput", "resources/set2/SampleOutput" },
 				{ "resources/set3/SampleGrammar", "resources/set3/SampleInput", "resources/set3/SampleOutput" },
-				{ "resources/set4/SampleGrammar", "resources/set4/SampleInput", "resources/set4/SampleOutput" },
-				{ "resources/set5/SampleGrammar", "resources/set5/SampleInput", "resources/set5/SampleOutput" }
+				{ "resources/set4/SampleGrammar", "resources/set4/SampleInput", "resources/set4/SampleOutput" }
 		};
 		return Arrays.asList(data);
 	}
