@@ -11,11 +11,6 @@ import java.util.regex.Pattern;
 public class InitParser {
 
 	private static Map<String, String> mapClasses, mapTokens;
-	private static Pattern pattern;
-
-	public static void main(String[] args) {
-		pattern = Pattern.compile("\\$[A-Z-]+");
-	}
 
 	Map<String, String>[] parse(String pathToGrammar, String pathToInput) {
 		// Input and scan the grammar file
