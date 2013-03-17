@@ -27,11 +27,15 @@ public class Main {
         pathToInput = args[1];
         
         // Input and scan the grammar file
-        Scanner scannerGrammar = scan(pathToGrammar);
+        //Scanner scannerGrammar = scan(pathToGrammar);
 
         // Parse the classes and then the tokens
-        Pattern pattern = parseClasses(scannerGrammar);
-        parseTokens(scannerGrammar, pattern);
+        //Pattern pattern = parseClasses(scannerGrammar);
+       // parseTokens(scannerGrammar, pattern);
+        Map<String, String>[] mapList = new Map[2];
+        InitParser initParse = new InitParser();
+        mapList = initParse.parse(pathToGrammar, pathToInput);
+        
         
         // TODO - input the input file
         
