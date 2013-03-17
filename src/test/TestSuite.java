@@ -17,14 +17,14 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 /*
- * These tests run with the examples given on T-Square
+ * Parameterized test cases - the set of tests run over all input parameters
  */
 @RunWith(value = Parameterized.class)
 public class TestSuite {
 
 	/*
 	 * The list of parameter groups to use for the tests
-	 * 
+	 * The first set is the samples given out on T-Square
 	 */
 	@Parameters
 	public static Collection<Object[]> data() {
