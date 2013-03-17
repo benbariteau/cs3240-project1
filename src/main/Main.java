@@ -34,6 +34,10 @@ public class Main {
         parseTokens(scannerGrammar, pattern);
         
         // TODO - input the input file
+        
+        // TODO - Determine parse tree
+        
+        // TODO - Create output based on input
     }
 
     /*
@@ -84,11 +88,11 @@ public class Main {
         }
 
         // Output all the character classes that we just scanned
-        System.out.println("Character Classes:");
-        for(String key : mapClasses.keySet()) {
-            System.out.println("{" + key + ", " + mapClasses.get(key) +"}");
-        }
-        System.out.println();
+//        System.out.println("Character Classes:");
+//        for(String key : mapClasses.keySet()) {
+//            System.out.println("{" + key + ", " + mapClasses.get(key) +"}");
+//        }
+//        System.out.println();
 		return pattern;
 	}
 
@@ -110,10 +114,10 @@ public class Main {
         }
 
         // Output all the character tokens that we just scanned
-        System.out.println("Tokens:");
-        for(String key : mapTokens.keySet()) {
-            System.out.println("{" + key + ", " + mapTokens.get(key) +"}");
-        }
+//        System.out.println("Tokens:");
+//        for(String key : mapTokens.keySet()) {
+//            System.out.println("{" + key + ", " + mapTokens.get(key) +"}");
+//        }
 	}
 
     /*
