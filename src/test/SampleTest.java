@@ -3,6 +3,10 @@ package test;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import main.Main;
 
@@ -17,21 +21,77 @@ public class SampleTest {
 
 	// Localized file paths
 	private final String pathGrammar = "resources/SampleGrammar", pathInput = "resources/SampleInput", pathOutput = "resources/SampleOutput";
-
+	
+	// The actual files
+	private File fileGrammar, fileInput, fileOutput;
+	
+	// The texts contained within the files
+	private final String textGrammar = "", textInput = "", textOutput = "";
+	
+	/*
+	 * Runs all of the test cases
+	 */
 	@Test
 	public void test_all() {
 		Main.main(new String[] { pathGrammar, pathInput });
 		assertTrue(true);
 	}
 
+	/*
+	 * Setup the test environment
+	 */
 	@Before
 	public void setUp() {
-		System.out.println("Running with sample files:");
-		System.out.println(new File(pathGrammar).getAbsolutePath());
-		System.out.println(new File(pathInput).getAbsolutePath());
-		System.out.println(new File(pathOutput).getAbsolutePath());
+		System.out.println("Running with samples:");
+		// Get the files ready
+		setUpFiles();
+		// Display file information
+		display();
 	}
 
+	/*
+	 * Creates all of the file objects from the given paths
+	 */
+	private void setUpFiles() {
+		fileGrammar = new File(pathGrammar);
+		fileInput = new File(pathInput);
+		fileOutput = new File(pathOutput);
+	}
+	
+	/*
+	 * Display all the file names and checks contents
+	 */
+	private void display() {
+		displayFile(fileGrammar, textGrammar);
+		displayFile(fileInput, textInput);
+		displayFile(fileOutput, textOutput);
+	}
+	
+	/*
+	 * Displays the file name and the contents to output
+	 * Also initializes the text contents of each file
+	 */
+	private void displayFile(File file, String text) {
+		System.out.println("\nFile: " + file.getAbsolutePath());
+		// Read in the file contents
+		Scanner scanner = null;
+		try {
+			scanner = new Scanner(file);
+		} catch (FileNotFoundException e) {
+			System.err.println("File not found:");
+			System.err.println(file.getAbsolutePath());
+            System.exit(-1);
+		}
+        while(scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            text += line;
+        }
+        System.out.println(text);
+	}
+
+	/*
+	 * Destroys the test environment
+	 */
 	@After
 	public void tearDown() {
 		// Empty
