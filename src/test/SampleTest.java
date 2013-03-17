@@ -33,7 +33,7 @@ public class SampleTest {
 	 */
 	@Test
 	public void test_all() {
-		Main.main(new String[] { pathGrammar, pathInput });
+		Main.main(new String[] { pathGrammar, pathInput }); // TODO - actually compare the output to the sample output
 		assertTrue(true);
 	}
 
@@ -78,14 +78,17 @@ public class SampleTest {
 		try {
 			scanner = new Scanner(file);
 		} catch (FileNotFoundException e) {
+			// If no file found, exit execution
 			System.err.println("File not found:");
 			System.err.println(file.getAbsolutePath());
             System.exit(-1);
 		}
+		// Go line-by-line and read the file
         while(scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            text += line;
+            text += line + System.getProperty("line.separator"); // Adds a newline character to the end of the string
         }
+        // Print the final string which represents the sum file contents
         System.out.println(text);
 	}
 
