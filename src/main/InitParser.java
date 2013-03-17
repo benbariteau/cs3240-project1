@@ -1,6 +1,5 @@
 package main;
 
-import java.awt.List;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -15,9 +14,7 @@ public class InitParser {
 	private static Pattern pattern;
 
 	public static void main(String[] args) {
-
 		pattern = Pattern.compile("\\$[A-Z-]+");
-
 	}
 
 	Map<String, String>[] parse(String pathToGrammar, String pathToInput) {
@@ -55,11 +52,11 @@ public class InitParser {
 	private HashMap<String, String> parseTokens(Scanner scanner) {
 		// HashMap of tokens and their token type
 		HashMap<String, String> tokenMap = new HashMap<String, String>();
-		Pattern pattern = Pattern.compile("\\$[A-Z-]+");
+		Pattern p = Pattern.compile("\\$[A-Z-]+");
 		// Parse for character tokens
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
-			Matcher matcher = pattern.matcher(line);
+			Matcher matcher = p.matcher(line);
 			matcher.find();
 			String token = matcher.group(0);
 			String rest = removeInitialWhitespace(line.substring(matcher.end()));
@@ -75,7 +72,7 @@ public class InitParser {
 	private HashMap<String, String> parseClasses(Scanner scanner) {
 		// HashMap of classes and their class type
 		HashMap<String, String> classMap = new HashMap<String, String>();
-		Pattern pattern = Pattern.compile("\\$[A-Z-]+");
+		Pattern p = Pattern.compile("\\$[A-Z-]+");
 		// Parse for character classes in grammar file
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
@@ -83,7 +80,7 @@ public class InitParser {
 				// A blank line means switch to the token parsing
 				break;
 			}
-			Matcher matcher = pattern.matcher(line);
+			Matcher matcher = p.matcher(line);
 			matcher.find();
 			String charClass = matcher.group(0);
 			String rest = removeInitialWhitespace(line.substring(matcher.end()));

@@ -29,9 +29,9 @@ public class TestSuite {
 	@Parameters
 	public static Collection<Object[]> data() {
 		Object[][] data = new Object[][] { 
-				{ "resources/SampleGrammar", "resources/SampleInput", "resources/SampleOutput" },
-				{ "resources/SampleGrammar", "resources/SampleInput", "resources/SampleOutput" },
-				{ "resources/SampleGrammar", "resources/SampleInput", "resources/SampleOutput" }
+				{ "resources/set1/SampleGrammar", "resources/set1/SampleInput", "resources/set1/SampleOutput" },
+				{ "resources/set2/SampleGrammar", "resources/set2/SampleInput", "resources/set2/SampleOutput" },
+				{ "resources/set3/SampleGrammar", "resources/set3/SampleInput", "resources/set3/SampleOutput" }
 		};
 		return Arrays.asList(data);
 	}
