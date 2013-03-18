@@ -108,7 +108,7 @@ public class Main {
 	}
 
     private static Terminal T(char c) {
-        return new Terminal(']');
+        return new Terminal(c);
     }
 
     /*
