@@ -9,6 +9,7 @@ public class Rule implements Symbol{
 
     public Rule(String ruleName) {
         this.ruleName = ruleName;
+        this.productions = new ArrayList<Production>();
     }
 
     public Rule(String ruleName, Production production) {

@@ -34,12 +34,16 @@ public class Main {
 		InitParser initParse = new InitParser();
 		mapList = initParse.parse(pathToGrammar, pathToInput);
 
+        List<Rule> regexRules = createRegexRules();
+
 		// TODO - input the input file
 
 		// TODO - Determine parse tree
 
 		// TODO - Create output based on input
+	}
 
+    private static List<Rule> createRegexRules() {
         char[] printableAscii = {' ', '!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C',
                 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
@@ -49,7 +53,7 @@ public class Main {
         Set<Character> escapeCharacters = new HashSet<Character>(Arrays.asList('^', '-', '[', ']'));
         Rule CLS_CHAR = new Rule("CLS_CHAR", getCharList(printableAscii, '\\', escapeCharacters));
 
-        escapeCharacters.addAll(Arrays.asList('*', '+', '?', '|', '[', ']', '(', ')', '.', '\'', '\"'));
+        escapeCharacters.addAll(Arrays.asList(' ', '*', '+', '?', '|', '[', ']', '(', ')', '.', '\'', '\"'));
         Rule RE_CHAR = new Rule("RE_CHAR", getCharList(printableAscii, '\\', escapeCharacters));
 
         Rule regEx = new Rule("reg-ex");
@@ -127,7 +131,9 @@ public class Main {
         rules.add(charSetTail);
         rules.add(excludeSet);
         rules.add(excludeSetTail);
-	}
+
+        return rules;
+    }
 
     private static List<Production> getCharList(char[] charSet, char escapeChar, Set<Character> escapedCharacters) {
         List<Production> charList = new ArrayList<Production>();
