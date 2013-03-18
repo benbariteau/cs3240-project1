@@ -1,8 +1,11 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Main {
 
@@ -37,15 +40,17 @@ public class Main {
 
 		// TODO - Create output based on input
 
-        Rule CLS_CHAR = new Rule("CLS_CHAR");
-        CLS_CHAR.addProduction(T('a'));
-        //all of the CLS_CHAR characters should be productions;
-        CLS_CHAR.addProduction(T('Z'));
+        char[] printableAscii = {' ', '!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C',
+                'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+                'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
+                'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~'};
 
-        Rule RE_CHAR = new Rule("RE_CHAR");
-        //add all of the RE_CHAR characters at productions
+        Set<Character> escapeCharacters = new HashSet<Character>(Arrays.asList('^', '-', '[', ']'));
+        Rule CLS_CHAR = new Rule("CLS_CHAR", getCharList(printableAscii, '\\', escapeCharacters));
 
-        List<Rule> rules = new ArrayList<Rule>();
+        escapeCharacters.addAll(Arrays.asList('*', '+', '?', '|', '[', ']', '(', ')', '.', '\'', '\"'));
+        Rule RE_CHAR = new Rule("RE_CHAR", getCharList(printableAscii, '\\', escapeCharacters));
 
         Rule regEx = new Rule("reg-ex");
         Rule rexp = new Rule("rexp");
@@ -105,7 +110,37 @@ public class Main {
 
         excludeSetTail.addProduction(new Terminal('['), charSet, new Terminal(']'));
         excludeSetTail.addProduction(new DefinedClass());
+
+        List<Rule> rules = new ArrayList<Rule>();
+        rules.add(regEx);
+        rules.add(rexp);
+        rules.add(rexpPrime);
+        rules.add(rexp1);
+        rules.add(rexp1Prime);
+        rules.add(rexp2);
+        rules.add(rexp2tail);
+        rules.add(rexp3);
+        rules.add(charClass);
+        rules.add(charClass1);
+        rules.add(charSetList);
+        rules.add(charSet);
+        rules.add(charSetTail);
+        rules.add(excludeSet);
+        rules.add(excludeSetTail);
 	}
+
+    private static List<Production> getCharList(char[] charSet, char escapeChar, Set<Character> escapedCharacters) {
+        List<Production> charList = new ArrayList<Production>();
+        charList.add(new Production(T(escapeChar), T(escapeChar)));
+        for(char c : charSet) {
+            if (escapedCharacters.contains(c)) {
+                charList.add(new Production(T(escapeChar), T(c)));
+                continue;
+            }
+            charList.add(new Production(T(c)));
+        }
+        return charList;
+    }
 
     private static Terminal T(char c) {
         return new Terminal(c);
