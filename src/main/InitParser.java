@@ -10,8 +10,23 @@ import java.util.regex.Pattern;
 
 public class InitParser {
 
-	private static Map<String, String> mapClasses, mapTokens;
+	/**
+	public static void main(String[] args)
+	{
+		InitParser parser = new InitParser();
+		
+		parser.parse("resources/set3/SampleGrammar", "resources/set3/SampleInput");
 
+		System.out.println(parser.getOutput());
+	}
+	*/
+	public InitParser()
+	{
+	
+	}
+	private Map<String, String> mapClasses, mapTokens;
+	private Map<String, CharacterClass> characterClasses, tokenClasses;
+	private String output;
 	Map<String, String>[] parse(String pathToGrammar, String pathToInput) {
 		// Input and scan the grammar file
 		Scanner scannerGrammar = scan(pathToGrammar);
@@ -19,12 +34,51 @@ public class InitParser {
 		// Parse the classes and then the tokens
 		mapClasses = parseClasses(scannerGrammar);
 		mapTokens = parseTokens(scannerGrammar);
+		characterClasses = createCharacterClasses();
+		
+		for(String key:characterClasses.keySet())
+		{
+			//System.out.println("Key: "+key+" Value: "+characterClasses.get(key).toString());
+		}
+		tokenClasses = createTokenClasses();
+		output = stringOutput(pathToInput);
+		
+		
 
 		Map<String, String>[] mapList = new Map[2];
 		mapList[0] = mapClasses;
 		mapList[1] = mapTokens;
 
 		return mapList;
+	}
+	
+	public String getOutput()
+	{
+		return output;
+	}
+	
+	private String stringOutput(String pathToInput)
+	{
+
+		Scanner scannerInput = scan(pathToInput);
+		String temp = "";
+		while(scannerInput.hasNext())
+		{
+			String line = scannerInput.nextLine();
+			String[] lineSplit = line.split("\\s");
+			
+			for(String token : lineSplit)
+			{
+				for(String key:tokenClasses.keySet())
+				{
+					if(tokenClasses.get(key).matches(token))
+					{
+						temp += key.replace("$","")+" "+token+"\n";
+					}
+				}
+			}
+		}
+		return temp;
 	}
 
 	/*
@@ -83,6 +137,7 @@ public class InitParser {
 		}
 		return classMap;
 	}
+	
 
 	/*
 	 * Removes all whitespace from a string
@@ -91,6 +146,58 @@ public class InitParser {
 		Pattern initialWhitespace = Pattern.compile("^\\s+");
 		Matcher whitespaceMatcher = initialWhitespace.matcher(substring);
 		return whitespaceMatcher.replaceAll("");
+	}
+	
+	private HashMap<String, CharacterClass> createCharacterClasses()
+	{
+		HashMap<String, CharacterClass> tempMap = new HashMap<String, CharacterClass>();
+		for(String key:mapClasses.keySet())
+		{
+			String value = mapClasses.get(key);
+			CharacterClass tempClass;
+			
+			// Find the "superclass" for this character class and pass it in the constructor
+			if(value.toUpperCase().contains("IN"))
+			{
+				String[] valSplit = value.split("\\s");
+				tempClass = new CharacterClass(valSplit[0],tempMap.get(valSplit[2]));
+			}
+			//Otherwise, just give the class the regex
+			else
+			{
+			tempClass = new CharacterClass(mapClasses.get(key));
+			}
+			
+			tempMap.put(key, tempClass);
+		}
+		return tempMap;
+	}
+	
+	private HashMap<String, CharacterClass> createTokenClasses()
+	{
+		HashMap<String, CharacterClass> tempMap = new HashMap<String, CharacterClass>();
+		for(String key:mapTokens.keySet())
+		{
+			String value = mapTokens.get(key);
+			CharacterClass tempClass;
+			
+			String[] valSplit = value.split("\\s");
+			String temp = "";
+			for(String split : valSplit)
+			{
+				for(String skey:characterClasses.keySet())
+				{
+					if(split.contains(skey))
+					{
+						split = split.replace(skey,characterClasses.get(skey).toString());
+					}
+				}
+				temp += split;
+			}
+			//System.out.println("Key: "+key+" regex: "+temp);
+			tempMap.put(key, new CharacterClass(temp));
+		}
+		return tempMap;
 	}
 
 }
