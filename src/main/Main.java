@@ -2,6 +2,7 @@ package main;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,21 @@ public class Main {
 		InitParser initParse = new InitParser();
 		mapList = initParse.parse(pathToGrammar, pathToInput);
 
-        List<Rule> regexRules = createRegexRules();
+        Rule definedClass = new Rule("defined-class");
+        for(String key : mapList[0].keySet()) {
+            definedClass.addProduction(key);
+        }
+
+        List<Rule> regexRules = createRegexRules(definedClass);
+        Map<Rule, Map<Symbol, Production>> parseTable = createParseTable(regexRules);
+
+        for(Rule rule : regexRules) {
+            Map<Symbol, Production> productionMap = parseTable.get(rule);
+            System.out.println(rule.getName()+":");
+            for(Symbol symbol : productionMap.keySet()) {
+                System.out.println("\t{ "+symbol+" => "+productionMap.get(symbol)+" }");
+            }
+        }
 
 		// TODO - input the input file
 
@@ -43,7 +58,70 @@ public class Main {
 		// TODO - Create output based on input
 	}
 
-    private static List<Rule> createRegexRules() {
+    private static Map<Rule, Map<Symbol, Production>> createParseTable(List<Rule> rules) {
+        Map<Rule, Map<Symbol, Production>> table = new HashMap<Rule, Map<Symbol, Production>>();
+        Map<Rule, Set<Symbol>> followSetMap = new HashMap<Rule, Set<Symbol>>();
+
+        for (Rule rule : rules) {
+            followSetMap.put(rule, new HashSet<Symbol>());
+        }
+
+        //Find follow for each rule
+        followSetMap.get(rules.get(0)).add(new EndOfInput());
+        boolean changed = true;
+        while(changed) {
+            changed = false;
+            for (Rule rule : rules) {
+                for (Production p : rule.getProductions()) {
+                    List<Symbol> symbolList = p.getSymbolList();
+                    for (int i = 0; i < symbolList.size(); i++) {
+                        Symbol symbol = symbolList.get(i);
+                        if (rules.contains(symbol)) {
+                            Set<Symbol> followFirst = new Production(symbolList.subList(i+1, symbolList.size())).getFirstSet(rule);
+                            boolean containedEmptyString = followFirst.remove(new EmptyString());
+                            changed = changed || followSetMap.get(symbol).addAll(followFirst);
+                            if (containedEmptyString) {
+                                changed = changed || followSetMap.get(symbol).addAll(followSetMap.get(rule));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        //Construct parse table
+        for(Rule rule : rules) {
+            Map<Symbol, Production> productionMap = new HashMap<Symbol, Production>();
+            Set<Symbol> followSet = followSetMap.get(rule);
+            for (Production p : rule.getProductions()) {
+                Set<Symbol> productionFirst = p.getFirstSet(rule);
+                for(Symbol s : productionFirst) {
+                    if (s instanceof Terminal) {
+                        productionMap.put(s, p);
+                    } else if (s instanceof EmptyString) {
+                        for(Symbol sym : followSet) {
+                            if (productionMap.get(sym) == null) {
+                                productionMap.put(sym, p);
+                            }
+                        }
+                    }
+                }
+            }
+            table.put(rule, productionMap);
+        }
+
+        return table;
+    }
+
+    public static void printSymbolSet(Set<Symbol> symbolSet) {
+        System.out.print("{");
+        for(Symbol s : symbolSet) {
+            System.out.print(s + ", ");
+        }
+        System.out.println("}");
+    }
+
+    private static List<Rule> createRegexRules(Rule definedClass) {
         char[] printableAscii = {' ', '!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C',
                 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
@@ -97,7 +175,7 @@ public class Main {
 
         charClass.addProduction(T('.'));
         charClass.addProduction(T('['), charClass1);
-        charClass.addProduction(new DefinedClass());
+        charClass.addProduction(definedClass);
 
         charClass1.addProduction(charSetList);
         charClass1.addProduction(excludeSet);
@@ -113,7 +191,7 @@ public class Main {
         excludeSet.addProduction(T('^'), charSet, T(']'), T(' '), T('I'), T('N'), T(' '), excludeSetTail);
 
         excludeSetTail.addProduction(new Terminal('['), charSet, new Terminal(']'));
-        excludeSetTail.addProduction(new DefinedClass());
+        excludeSetTail.addProduction(definedClass);
 
         List<Rule> rules = new ArrayList<Rule>();
         rules.add(regEx);

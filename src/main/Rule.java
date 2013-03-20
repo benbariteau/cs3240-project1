@@ -1,7 +1,9 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Rule implements Symbol{
     String ruleName;
@@ -31,4 +33,28 @@ public class Rule implements Symbol{
         productions.add(new Production(symbols));
     }
 
+    public void addProduction(String string) {
+        productions.add(new Production(string));
+    }
+
+    public List<Production> getProductions() {
+        return productions;
+    }
+
+    public Set<Symbol> getFirstSet() {
+        Set<Symbol> firstSet = new HashSet<Symbol>();
+        for (Production production : productions) {
+            firstSet.addAll(production.getFirstSet(this));
+        }
+        return firstSet;
+    }
+
+    public String getName() {
+        return ruleName;
+    }
+
+    @Override
+    public String toString() {
+        return "<"+ruleName+">";
+    }
 }
