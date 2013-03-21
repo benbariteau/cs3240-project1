@@ -1,22 +1,27 @@
 package main;
 
+/**
+ * A class that represents an entire parse tree
+ */
 public class ParseTree {
-    ParseNode head;
+	
+	ParseNode head;
 
-    public ParseTree(Rule rule) {
-        head = new ParseNode(rule);
-    }
+	public ParseTree(Rule rule) {
+		head = new ParseNode(rule);
+	}
 
-    public ParseNode getHead() {
-        return head;
-    }
+	public ParseNode getHead() {
+		return head;
+	}
 
-    @Override
-    public String toString() {
-        return head.toString();
-    }
+	@Override
+	public String toString() {
+		return head.toString();
+	}
 
-    public String getInputString() {
-        return head.getInputString();
-    }
+	public String getInputString() {
+		return head.getInputString();
+	}
+
 }
