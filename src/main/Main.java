@@ -37,15 +37,23 @@ public class Main {
 		InitParser initParse = new InitParser();
 		mapList = initParse.parse(pathToGrammar, pathToInput);
 
-        Map<String, String> grammar = mapList[0];
+        Map<String, String> characterClasses = mapList[0];
+        Map<String, String> tokens = mapList[1];
 
         List<Rule> regexRules = createRegexRules();
         Map<Rule, Map<Symbol, Production>> parseTable = createParseTable(regexRules);
 
-        for(String key : grammar.keySet()) {
-            ParseTree parseTree = parse(grammar.get(key), parseTable, regexRules.get(0));
+        for(String key : characterClasses.keySet()) {
+            ParseTree parseTree = parse(characterClasses.get(key), parseTable, regexRules.get(0));
+            System.out.println(parseTree);
+            System.out.println(parseTree.getInputString());
         }
 
+        for(String key : tokens.keySet()) {
+            ParseTree parseTree = parse(tokens.get(key), parseTable, regexRules.get(0));
+            System.out.println(parseTree);
+            System.out.println(parseTree.getInputString());
+        }
 
 
 		// TODO - input the input file
@@ -57,45 +65,47 @@ public class Main {
 
     private static ParseTree parse(String input, Map<Rule, Map<Symbol, Production>> parseTable, Rule startVariable) {
         ParseTree tree = new ParseTree(startVariable);
-        List<Symbol> inputSymbols = inputToSymbolList(input);
-        Deque<Symbol> parseStack = new ArrayDeque<Symbol>();
-        parseStack.push(new EndOfInput());
-        parseStack.push(startVariable);
+        ParseNode node = tree.getHead();
+
+        List<Symbol> inputSymbols = stringToSymbolList(input);
+        Deque<ParseNode> parseStack = new ArrayDeque<ParseNode>();
+        parseStack.push(new ParseNode(new EndOfInput()));
+        parseStack.push(node);
+
         while(inputSymbols.size() > 0) {
-            Symbol top = parseStack.peek();
+            ParseNode top = parseStack.peek();
+            Symbol topSymbol = top.getSymbol();
             Symbol first = inputSymbols.get(0);
-            if (top instanceof Rule) {
-                Production p = parseTable.get(top).get(first);
+
+            if (topSymbol instanceof Rule) {
+                Production p = parseTable.get(topSymbol).get(first);
                 parseStack.pop();
-                List<Symbol> productionSymbols = p.getSymbolList();
-                for (int i = productionSymbols.size() - 1; i >= 0; i--) {
-                    Symbol symbol = productionSymbols.get(i);
-                    if(!(symbol instanceof EmptyString)) {
-                        parseStack.push(symbol);
+
+                List<ParseNode> parseNodes = p.getParseNodes();
+
+                node.addChildren(parseNodes);
+                if(!(parseNodes.get(0).getSymbol() instanceof EmptyString)) {
+                    node = parseNodes.get(0);
+                }
+
+                for (int i = parseNodes.size() - 1; i >= 0; i--) {
+                    ParseNode parseNode = parseNodes.get(i);
+                    if(!(parseNode.getSymbol() instanceof EmptyString)) {
+                        parseStack.push(parseNode);
                     }
                 }
             } else {
-                if (first.equals(top)) {
+                if (first.equals(topSymbol)) {
                     parseStack.pop();
                     inputSymbols.remove(0);
-                } else {
-                    throw new IllegalStateException();
+                    node = parseStack.peek();
                 }
             }
-            System.out.print("Stack: ");
-            for(Symbol symbol : parseStack) {
-                System.out.print(symbol + " ");
-            }
-            System.out.print("\nInput: ");
-            for(Symbol symbol : inputSymbols) {
-                System.out.print(symbol);
-            }
-            System.out.println("\n");
         }
         return tree;
     }
 
-    private static List<Symbol> inputToSymbolList(String input) {
+    private static List<Symbol> stringToSymbolList(String input) {
         List<Symbol> symbolList = new ArrayList<Symbol>();
         for(char c : input.toCharArray()) {                                                                                         ;
             symbolList.add(T(c));
@@ -160,18 +170,6 @@ public class Main {
     }
 
     private static List<Rule> createRegexRules() {
-        char[] printableAscii = {' ', '!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C',
-                'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
-                'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
-                'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~'};
-
-        Set<Character> escapeCharacters = new HashSet<Character>(Arrays.asList('^', '-', '[', ']'));
-        Rule CLS_CHAR = new Rule("CLS_CHAR", getCharList(printableAscii, '\\', escapeCharacters));
-
-        escapeCharacters.addAll(Arrays.asList(' ', '*', '+', '?', '|', '[', ']', '(', ')', '.', '\'', '\"'));
-        Rule RE_CHAR = new Rule("RE_CHAR", getCharList(printableAscii, '\\', escapeCharacters));
-
         Rule regEx = new Rule("reg-ex");
         Rule rexp = new Rule("rexp");
         Rule rexpPrime = new Rule("rexp\'");
@@ -189,6 +187,10 @@ public class Main {
         Rule excludeSetTail = new Rule("exclude-set-tail");
         Rule definedClass = new Rule("defined-class");
         Rule definedClass1 = new Rule("defined-class1");
+        Rule CLS_CHAR = new Rule("CLS_CHAR");
+        Rule CLS_CHAR_ESCAPE = new Rule("CLS_CHAR_ESCAPE");
+        Rule RE_CHAR = new Rule("RE_CHAR");
+        Rule RE_CHAR_ESCAPE = new Rule("RE_CHAR_ESCAPE");
 
         regEx.addProduction(rexp);
 
@@ -238,6 +240,24 @@ public class Main {
         definedClass1.addProduction(RE_CHAR, definedClass1);
         definedClass1.addProduction(new EmptyString());
 
+        char[] printableAscii = {' ', '!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C',
+                'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+                'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
+                'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~'};
+
+        Set<Character> escapeCharacters = new HashSet<Character>(Arrays.asList('\\', '^', '-', '[', ']'));
+        CLS_CHAR.addProductions(getCharList(printableAscii, escapeCharacters));
+        CLS_CHAR.addProduction(T('\\'), CLS_CHAR_ESCAPE);
+
+        CLS_CHAR_ESCAPE.addProductions(getCharList(escapeCharacters));
+
+        escapeCharacters = new HashSet<Character>(Arrays.asList('\\', ' ', '*', '+', '?', '|', '[', ']', '(', ')', '.', '\'', '\"'));
+        RE_CHAR.addProductions(getCharList(printableAscii, escapeCharacters));
+        RE_CHAR.addProduction(T('\\'), RE_CHAR_ESCAPE);
+
+        RE_CHAR_ESCAPE.addProductions(getCharList(escapeCharacters));
+
         List<Rule> rules = new ArrayList<Rule>();
         rules.add(regEx);
         rules.add(rexp);
@@ -254,20 +274,28 @@ public class Main {
         rules.add(charSetTail);
         rules.add(excludeSet);
         rules.add(excludeSetTail);
-        rules.add(CLS_CHAR);
-        rules.add(RE_CHAR);
         rules.add(definedClass);
         rules.add(definedClass1);
+        rules.add(CLS_CHAR);
+        rules.add(CLS_CHAR_ESCAPE);
+        rules.add(RE_CHAR);
+        rules.add(RE_CHAR_ESCAPE);
 
         return rules;
     }
 
-    private static List<Production> getCharList(char[] charSet, char escapeChar, Set<Character> escapedCharacters) {
+    private static List<Production> getCharList(Set<Character> escapeCharacters) {
+        List<Production> productions = new ArrayList<Production>();
+        for (char c : escapeCharacters) {
+            productions.add(new Production(T(c)));
+        }
+        return productions;
+    }
+
+    private static List<Production> getCharList(char[] charSet, Set<Character> escapedCharacters) {
         List<Production> charList = new ArrayList<Production>();
-        charList.add(new Production(T(escapeChar), T(escapeChar)));
         for(char c : charSet) {
             if (escapedCharacters.contains(c)) {
-                charList.add(new Production(T(escapeChar), T(c)));
                 continue;
             }
             charList.add(new Production(T(c)));

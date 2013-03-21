@@ -1,6 +1,7 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -56,5 +57,9 @@ public class Rule implements Symbol{
     @Override
     public String toString() {
         return "<"+ruleName+">";
+    }
+
+    public void addProductions(Collection<Production> charList) {
+        productions.addAll(charList);
     }
 }

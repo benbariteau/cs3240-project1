@@ -56,4 +56,12 @@ public class Production {
         }
         return s;
     }
+
+    public List<ParseNode> getParseNodes() {
+        List<ParseNode> nodes = new ArrayList<ParseNode>();
+        for(Symbol s : symbols) {
+            nodes.add(new ParseNode(s));
+        }
+        return nodes;
+    }
 }

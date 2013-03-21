@@ -109,6 +109,7 @@ public class InitParser {
 			matcher.find();
 			String token = matcher.group(0);
 			String rest = removeInitialWhitespace(line.substring(matcher.end()));
+            rest = removeUnescapedSpaces(rest);
 			tokenMap.put(token, rest);
 		}
 		return tokenMap;
@@ -133,15 +134,28 @@ public class InitParser {
 			matcher.find();
 			String charClass = matcher.group(0);
 			String rest = removeInitialWhitespace(line.substring(matcher.end()));
+            rest = removeUnescapedSpaces(rest);
 			classMap.put(charClass, rest);
 		}
 		return classMap;
 	}
-	
 
-	/*
-	 * Removes all whitespace from a string
-	 */
+    /**
+     * Removes unescaped spaces except in exclude classes
+     * @param line
+     * @return
+     */
+    private String removeUnescapedSpaces(String line) {
+        Pattern p = Pattern.compile("(?<!\\\\|IN) (?!IN)");
+        Matcher matcher = p.matcher(line);
+        line = matcher.replaceAll("");
+        return line;
+    }
+
+
+    /*
+     * Removes all whitespace from a string
+     */
 	private String removeInitialWhitespace(String substring) {
 		Pattern initialWhitespace = Pattern.compile("^\\s+");
 		Matcher whitespaceMatcher = initialWhitespace.matcher(substring);

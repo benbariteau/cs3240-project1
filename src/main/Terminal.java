@@ -14,6 +14,10 @@ public class Terminal implements Symbol {
         return character;
     }
 
+    public char getCharacter() {
+        return character;
+    }
+
     public boolean equals(Object obj) {
         if (!(obj instanceof Terminal)) {
             return false;
