@@ -12,4 +12,12 @@ public class EndOfInput implements Symbol {
     public String toString() {
         return "<$>";
     }
+
+    public int hashCode() {
+        return 0;
+    }
+
+    public boolean equals(Object obj) {
+        return obj instanceof EndOfInput;
+    }
 }

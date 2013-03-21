@@ -1,7 +1,9 @@
 package main;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,21 +37,16 @@ public class Main {
 		InitParser initParse = new InitParser();
 		mapList = initParse.parse(pathToGrammar, pathToInput);
 
-        Rule definedClass = new Rule("defined-class");
-        for(String key : mapList[0].keySet()) {
-            definedClass.addProduction(key);
-        }
+        Map<String, String> grammar = mapList[0];
 
-        List<Rule> regexRules = createRegexRules(definedClass);
+        List<Rule> regexRules = createRegexRules();
         Map<Rule, Map<Symbol, Production>> parseTable = createParseTable(regexRules);
 
-        for(Rule rule : regexRules) {
-            Map<Symbol, Production> productionMap = parseTable.get(rule);
-            System.out.println(rule.getName()+":");
-            for(Symbol symbol : productionMap.keySet()) {
-                System.out.println("\t{ "+symbol+" => "+productionMap.get(symbol)+" }");
-            }
+        for(String key : grammar.keySet()) {
+            ParseTree parseTree = parse(grammar.get(key), parseTable, regexRules.get(0));
         }
+
+
 
 		// TODO - input the input file
 
@@ -57,6 +54,55 @@ public class Main {
 
 		// TODO - Create output based on input
 	}
+
+    private static ParseTree parse(String input, Map<Rule, Map<Symbol, Production>> parseTable, Rule startVariable) {
+        ParseTree tree = new ParseTree(startVariable);
+        List<Symbol> inputSymbols = inputToSymbolList(input);
+        Deque<Symbol> parseStack = new ArrayDeque<Symbol>();
+        parseStack.push(new EndOfInput());
+        parseStack.push(startVariable);
+        while(inputSymbols.size() > 0) {
+            Symbol top = parseStack.peek();
+            Symbol first = inputSymbols.get(0);
+            if (top instanceof Rule) {
+                Production p = parseTable.get(top).get(first);
+                parseStack.pop();
+                List<Symbol> productionSymbols = p.getSymbolList();
+                for (int i = productionSymbols.size() - 1; i >= 0; i--) {
+                    Symbol symbol = productionSymbols.get(i);
+                    if(!(symbol instanceof EmptyString)) {
+                        parseStack.push(symbol);
+                    }
+                }
+            } else {
+                if (first.equals(top)) {
+                    parseStack.pop();
+                    inputSymbols.remove(0);
+                } else {
+                    throw new IllegalStateException();
+                }
+            }
+            System.out.print("Stack: ");
+            for(Symbol symbol : parseStack) {
+                System.out.print(symbol + " ");
+            }
+            System.out.print("\nInput: ");
+            for(Symbol symbol : inputSymbols) {
+                System.out.print(symbol);
+            }
+            System.out.println("\n");
+        }
+        return tree;
+    }
+
+    private static List<Symbol> inputToSymbolList(String input) {
+        List<Symbol> symbolList = new ArrayList<Symbol>();
+        for(char c : input.toCharArray()) {                                                                                         ;
+            symbolList.add(T(c));
+        }
+        symbolList.add(new EndOfInput());
+        return symbolList;
+    }
 
     private static Map<Rule, Map<Symbol, Production>> createParseTable(List<Rule> rules) {
         Map<Rule, Map<Symbol, Production>> table = new HashMap<Rule, Map<Symbol, Production>>();
@@ -113,15 +159,7 @@ public class Main {
         return table;
     }
 
-    public static void printSymbolSet(Set<Symbol> symbolSet) {
-        System.out.print("{");
-        for(Symbol s : symbolSet) {
-            System.out.print(s + ", ");
-        }
-        System.out.println("}");
-    }
-
-    private static List<Rule> createRegexRules(Rule definedClass) {
+    private static List<Rule> createRegexRules() {
         char[] printableAscii = {' ', '!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C',
                 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
@@ -149,6 +187,8 @@ public class Main {
         Rule charSetTail = new Rule("char-set-tail");
         Rule excludeSet = new Rule("exclude-set");
         Rule excludeSetTail = new Rule("exclude-set-tail");
+        Rule definedClass = new Rule("defined-class");
+        Rule definedClass1 = new Rule("defined-class1");
 
         regEx.addProduction(rexp);
 
@@ -193,6 +233,11 @@ public class Main {
         excludeSetTail.addProduction(new Terminal('['), charSet, new Terminal(']'));
         excludeSetTail.addProduction(definedClass);
 
+        definedClass.addProduction(T('$'), definedClass1);
+
+        definedClass1.addProduction(RE_CHAR, definedClass1);
+        definedClass1.addProduction(new EmptyString());
+
         List<Rule> rules = new ArrayList<Rule>();
         rules.add(regEx);
         rules.add(rexp);
@@ -209,6 +254,10 @@ public class Main {
         rules.add(charSetTail);
         rules.add(excludeSet);
         rules.add(excludeSetTail);
+        rules.add(CLS_CHAR);
+        rules.add(RE_CHAR);
+        rules.add(definedClass);
+        rules.add(definedClass1);
 
         return rules;
     }
