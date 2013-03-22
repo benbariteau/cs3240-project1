@@ -10,16 +10,16 @@ import java.util.regex.Pattern;
 
 public class InitParser {
 
-	/**
+	
 	public static void main(String[] args)
 	{
 		InitParser parser = new InitParser();
 		
-		parser.parse("resources/set3/SampleGrammar", "resources/set3/SampleInput");
+		parser.parse("resources/set1/SampleGrammar", "resources/set1/SampleInput");
 
 		System.out.println(parser.getOutput());
 	}
-	*/
+	
 	public InitParser()
 	{
 	
