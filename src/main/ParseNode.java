@@ -6,6 +6,7 @@ import java.util.List;
 public class ParseNode {
     Symbol symbol;
     List<ParseNode> children;
+    String inputString;
 
     public ParseNode(Symbol s) {
         symbol = s;
@@ -41,17 +42,25 @@ public class ParseNode {
     }
 
     public String getInputString() {
-        if(symbol instanceof Rule) {
-            String s = "";
-            if (children != null) {
-                for (ParseNode child : children) {
-                    s += child.getInputString();
+        if(inputString == null) {
+            if(symbol instanceof Rule) {
+                String s = "";
+                if (children != null) {
+                    for (ParseNode child : children) {
+                        s += child.getInputString();
+                    }
                 }
+                inputString =  s;
+            } else if (symbol instanceof EmptyString) {
+                inputString = "";
+            } else {
+                inputString = symbol.toString();
             }
-            return s;
-        } else if (symbol instanceof EmptyString) {
-            return "";
         }
-        return symbol.toString();
+        return inputString;
+    }
+
+    public boolean hasEmptyChildren() {
+        return children == null || children.size() == 0 || children.get(0).symbol.equals(new EmptyString());
     }
 }
