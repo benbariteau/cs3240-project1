@@ -43,12 +43,14 @@ public class NFA {
         if(fromStart == null) {
             fromStart = new HashMap<Character, Set<State>>();
             table.put(startState, fromStart);
-        }
-        State failState = new State("fail");
-        for (Character c : charSet) {
-            Set<State> states = new HashSet<State>();
-            states.add(failState);
-            fromStart.put(c, states);
+        } else {
+            Map<Character, Set<State>> newStartTransitions = new HashMap<Character, Set<State>>();
+            for (Character c : fromStart.keySet()) {
+                if (!charSet.contains(c)) {
+                    newStartTransitions.put(c, fromStart.get(c));
+                }
+            }
+            table.put(startState, newStartTransitions);
         }
         return this;
     }
@@ -157,7 +159,6 @@ public class NFA {
         return s;
     }
 
-    @Override
     public NFA clone() {
         NFA clone = new NFA();
 

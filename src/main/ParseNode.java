@@ -3,6 +3,9 @@ package main;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * A class that represents a singular parse node
+ */
 public class ParseNode {
     Symbol symbol;
     List<ParseNode> children;
