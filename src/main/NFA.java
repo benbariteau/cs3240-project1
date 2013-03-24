@@ -23,9 +23,9 @@ public class NFA {
 
     public static NFA constructNFAFromCharacterSet(Set<Character> characters) {
         NFA nfa = new NFA();
-        nfa.startState = new State("start");
+        nfa.startState = new State();
 
-        State endState = new State("end");
+        State endState = new State();
         nfa.acceptStates.add(endState);
 
         Map<Character, Set<State>> map = new HashMap<Character, Set<State>>();
@@ -120,7 +120,7 @@ public class NFA {
     public NFA unionNFA(NFA unionRHS) {
         table.putAll(unionRHS.table);
 
-        State newStart = new State("newStart");
+        State newStart = new State();
 
         Map<Character, Set<State>> transitions = new HashMap<Character, Set<State>>();
         Set<State> states = new HashSet<State>();
@@ -143,11 +143,11 @@ public class NFA {
             boolean st = state == startState;
             s +=  (st?">":"") + (a?"(":"") + state + (a?")":"") + " [";
             for (Character c : transitions.keySet()) {
-                s += c + "{";
+                s += c + "[";
                 for (State transitionState : transitions.get(c)) {
                     s += transitionState + ", ";
                 }
-                s += "} ";
+                s += "] ";
             }
             s += "]\n";
         }
@@ -164,13 +164,13 @@ public class NFA {
 
         Map<State, State> oldToNew = new HashMap<State, State>();
 
-        oldToNew.put(startState, new State("clone"));
+        oldToNew.put(startState, new State());
         clone.startState = oldToNew.get(startState);
         clone.table = new HashMap<State, Map<Character, Set<State>>>();
         for (State state : table.keySet()) {
             State newState = oldToNew.get(state);
             if (newState == null) {
-                newState = new State("clone");
+                newState = new State();
                 oldToNew.put(state, newState);
             }
             Map<Character, Set<State>> transitions = new HashMap<Character, Set<State>>();
@@ -180,7 +180,7 @@ public class NFA {
                 for(State s : states) {
                     State ns = oldToNew.get(s);
                     if (ns == null) {
-                        ns = new State("clone");
+                        ns = new State();
                         oldToNew.put(s, ns);
                     }
                     newStates.add(ns);
@@ -193,7 +193,7 @@ public class NFA {
         for (State accept : acceptStates) {
             State newAccept = oldToNew.get(accept);
             if (newAccept == null) {
-                newAccept = new State("clone");
+                newAccept = new State();
                 oldToNew.put(accept, newAccept);
             }
             clone.acceptStates.add(oldToNew.get(accept));
