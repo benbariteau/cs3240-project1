@@ -21,6 +21,7 @@ public class Main {
             'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~'));
     static Map<String, NFA> nfas = new HashMap<String, NFA>();
     static NFA bigNFA;
+    static DFA dfa;
     static Map<String, ParseTree> classesParseTrees =  new HashMap<String, ParseTree>();
     static Map<String, ParseTree> tokensParseTrees = new HashMap<String, ParseTree>();
 
@@ -68,9 +69,8 @@ public class Main {
         
         //Combine all NFAs and apply the star function to create 
         combineNFAs();
-        System.out.println(bigNFA);
-        // TODO - convert NFA to DFA
         
+        dfa = DFA.createFromNFA(bigNFA);
         
 		// TODO - input the input file
 
