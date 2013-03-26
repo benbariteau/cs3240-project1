@@ -132,6 +132,39 @@ public class NFA {
         acceptStates.addAll(unionRHS.acceptStates);
         return this;
     }
+    
+    public static NFA unionNFAs(Collection<NFA> nfas)
+    {
+    	//Create new NFA to be the giant unioned NFA
+    	NFA tempNFA = new NFA();
+    	
+    	//Add all transitions to the NFA
+    	for(NFA nfa : nfas)
+    	{
+    		tempNFA.table.putAll(nfa.table);
+    	}
+    	
+    	//Point new NFA's start state to all the unioned NFAs
+    	State newStart = new State();
+    	Map<Character, Set<State>> transitions = new HashMap<Character, Set<State>>();
+    	Set<State> states = new HashSet<State>();
+    	
+    	for(NFA nfa : nfas)
+    	{
+    	states.add(nfa.startState);
+    	}
+    	
+    	transitions.put(null, states);
+    	tempNFA.table.put(newStart, transitions);
+    	tempNFA.startState = newStart;
+    	
+    	for(NFA nfa : nfas)
+    	{
+    		tempNFA.acceptStates.addAll(nfa.acceptStates);
+    	}
+    	
+    	return tempNFA;
+    }
 
     @Override
     public String toString() {

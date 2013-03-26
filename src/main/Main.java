@@ -61,13 +61,26 @@ public class Main {
             tokensParseTrees.put(key, parseTree);
         }
 
+        //Create basic NFAs for each class and token
         createBasicNFAs(classesParseTrees);
         createBasicNFAs(tokensParseTrees);
+        
+        //Combine all NFAs and apply the star function to create 
+        combineNFAs();
+        System.out.println(bigNFA);
+        // TODO - convert NFA to DFA
+        
+        
 		// TODO - input the input file
 
 		// TODO - Determine parse tree
 
 		// TODO - Create output based on input
+	}
+	
+	private static void combineNFAs()
+	{
+		bigNFA = NFA.unionNFAs(nfas.values());
 	}
 
     private static void createBasicNFAs(Map<String, ParseTree> classesParseTrees) {
