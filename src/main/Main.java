@@ -20,6 +20,7 @@ public class Main {
             'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
             'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~'));
     static Map<String, NFA> nfas = new HashMap<String, NFA>();
+    static NFA bigNFA;
     static Map<String, ParseTree> classesParseTrees =  new HashMap<String, ParseTree>();
     static Map<String, ParseTree> tokensParseTrees = new HashMap<String, ParseTree>();
 
