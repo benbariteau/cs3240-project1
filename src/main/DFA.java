@@ -167,7 +167,7 @@ public class DFA {
             	
                 boolean st = state == startState;
                 boolean a = acceptStates.contains(state);
-                writer.write((st?"Start State > ":"") + (a?"Accept State":"") +state.toString().replaceAll(",", "+") + " ,");
+                writer.write((st?"Start State > ":"") + (a?"Accept State: ":"") +state.toString().replaceAll(",", "+") + " ,");
 
                 Map<Character, State> transitions = table.get(state);
                 for (Character c : cArray) 
@@ -176,17 +176,14 @@ public class DFA {
                 }
                 writer.write("\n");
             }
-
-            writer.write("Accept States, ");
-            for (State state : acceptStates) {
-                writer.write(state + ", ");
-            }
-    		
+            writer.flush();
+            writer.close();
     	}
     	catch(Exception e)
     	{
     		System.out.println("I/O error in DFA table output: "+e);
     	}
+    	
     	
     }
 }
