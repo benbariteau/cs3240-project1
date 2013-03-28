@@ -302,61 +302,6 @@ public class Main {
         return symbolList;
     }
 
-    private static Map<Rule, Map<Symbol, Production>> createParseTable(List<Rule> rules) {
-        Map<Rule, Map<Symbol, Production>> table = new HashMap<Rule, Map<Symbol, Production>>();
-        Map<Rule, Set<Symbol>> followSetMap = new HashMap<Rule, Set<Symbol>>();
-
-        for (Rule rule : rules) {
-            followSetMap.put(rule, new HashSet<Symbol>());
-        }
-
-        //Find follow for each rule
-        followSetMap.get(rules.get(0)).add(new EndOfInput());
-        boolean changed = true;
-        while(changed) {
-            changed = false;
-            for (Rule rule : rules) {
-                for (Production p : rule.getProductions()) {
-                    List<Symbol> symbolList = p.getSymbolList();
-                    for (int i = 0; i < symbolList.size(); i++) {
-                        Symbol symbol = symbolList.get(i);
-                        if (rules.contains(symbol)) {
-                            Set<Symbol> followFirst = new Production(symbolList.subList(i+1, symbolList.size())).getFirstSet(rule);
-                            boolean containedEmptyString = followFirst.remove(new EmptyString());
-                            changed = changed || followSetMap.get(symbol).addAll(followFirst);
-                            if (containedEmptyString) {
-                                changed = changed || followSetMap.get(symbol).addAll(followSetMap.get(rule));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        //Construct parse table
-        for(Rule rule : rules) {
-            Map<Symbol, Production> productionMap = new HashMap<Symbol, Production>();
-            Set<Symbol> followSet = followSetMap.get(rule);
-            for (Production p : rule.getProductions()) {
-                Set<Symbol> productionFirst = p.getFirstSet(rule);
-                for(Symbol s : productionFirst) {
-                    if (s instanceof Terminal) {
-                        productionMap.put(s, p);
-                    } else if (s instanceof EmptyString) {
-                        for(Symbol sym : followSet) {
-                            if (productionMap.get(sym) == null) {
-                                productionMap.put(sym, p);
-                            }
-                        }
-                    }
-                }
-            }
-            table.put(rule, productionMap);
-        }
-
-        return table;
-    }
-
     private static Grammar createRegexRules() {
         Rule regEx = new Rule("reg-ex");
         Rule rexp = new Rule("rexp");
