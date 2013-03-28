@@ -31,6 +31,8 @@ public class Main {
             'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
             'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~'));
     static Map<String, NFA> nfas = new HashMap<String, NFA>();
+    static NFA bigNFA;
+    static DFA dfa;
     static Map<String, ParseTree> classesParseTrees =  new HashMap<String, ParseTree>();
     static Map<String, ParseTree> tokensParseTrees = new HashMap<String, ParseTree>();
 
@@ -72,13 +74,25 @@ public class Main {
             tokensParseTrees.put(key, parseTree);
         }
 
+        //Create basic NFAs for each class and token
         createBasicNFAs(classesParseTrees);
         createBasicNFAs(tokensParseTrees);
+        
+        //Combine all NFAs and apply the star function to create 
+        combineNFAs();
+        
+        dfa = DFA.createFromNFA(bigNFA);
+        
 		// TODO - input the input file
 
 		// TODO - Determine parse tree
 
 		// TODO - Create output based on input
+	}
+	
+	private static void combineNFAs()
+	{
+		bigNFA = NFA.unionNFAs(nfas.values());
 	}
 
     private static void createBasicNFAs(Map<String, ParseTree> parseTrees) {
