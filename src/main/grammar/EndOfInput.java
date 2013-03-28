@@ -1,4 +1,4 @@
-package main;
+package main.grammar;
 
 import java.util.Set;
 

@@ -1,5 +1,12 @@
 package main;
 
+import main.grammar.EmptyString;
+import main.grammar.EndOfInput;
+import main.grammar.Production;
+import main.grammar.Rule;
+import main.grammar.Symbol;
+import main.grammar.Terminal;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,9 +77,9 @@ public class Main {
 		// TODO - Create output based on input
 	}
 
-    private static void createBasicNFAs(Map<String, ParseTree> classesParseTrees) {
-        for (String key : classesParseTrees.keySet()) {
-            ParseTree parseTree = classesParseTrees.get(key);
+    private static void createBasicNFAs(Map<String, ParseTree> parseTrees) {
+        for (String key : parseTrees.keySet()) {
+            ParseTree parseTree = parseTrees.get(key);
             ParseNode rexp = parseTree.getHead().getChildren().get(0);
             if (nfas.get(key) == null) {
                 NFA nfa = parseRexp(rexp);
@@ -426,7 +433,7 @@ public class Main {
 
         CLS_CHAR_ESCAPE.addProductions(getCharList(escapeCharacters));
 
-        escapeCharacters = new HashSet<Character>(Arrays.asList('\\', ' ', '*', '+', '?', '|', '[', ']', '(', ')', '.', '\'', '\"'));
+        escapeCharacters = new HashSet<Character>(Arrays.asList('\\', ' ', '*', '+', '?', '|', '[', ']', '(', ')', '.', '\'', '\"', '$'));
         RE_CHAR.addProductions(getCharList(printableAscii, escapeCharacters));
         RE_CHAR.addProduction(T('\\'), RE_CHAR_ESCAPE);
 

@@ -1,5 +1,7 @@
 package main;
 
+import main.grammar.Rule;
+
 /**
  * A class that represents an entire parse tree
  */

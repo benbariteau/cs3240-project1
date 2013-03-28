@@ -1,4 +1,10 @@
-package main;
+package main.grammar;
+
+import main.ParseNode;
+import main.grammar.EmptyString;
+import main.grammar.Rule;
+import main.grammar.Symbol;
+import main.grammar.Terminal;
 
 import java.util.ArrayList;
 import java.util.Arrays;

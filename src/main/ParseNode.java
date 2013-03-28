@@ -1,5 +1,9 @@
 package main;
 
+import main.grammar.EmptyString;
+import main.grammar.Rule;
+import main.grammar.Symbol;
+
 import java.util.Arrays;
 import java.util.List;
 
