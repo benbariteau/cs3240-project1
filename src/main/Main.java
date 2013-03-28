@@ -1,20 +1,16 @@
 package main;
 
 import main.grammar.EmptyString;
-import main.grammar.EndOfInput;
 import main.grammar.Grammar;
 import main.grammar.Production;
 import main.grammar.Rule;
-import main.grammar.Symbol;
 import main.grammar.Terminal;
 import main.parse.ParseNode;
 import main.parse.ParseTable;
 import main.parse.ParseTree;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -75,8 +71,8 @@ public class Main {
         }
 
         //Create basic NFAs for each class and token
-        createBasicNFAs(classesParseTrees);
-        createBasicNFAs(tokensParseTrees);
+        createNFAs(classesParseTrees);
+        createNFAs(tokensParseTrees);
         
         //Combine all NFAs and apply the star function to create 
         combineNFAs();
@@ -95,15 +91,21 @@ public class Main {
 		bigNFA = NFA.unionNFAs(nfas.values());
 	}
 
-    private static void createBasicNFAs(Map<String, ParseTree> parseTrees) {
+    private static void createNFAs(Map<String, ParseTree> parseTrees) {
         for (String key : parseTrees.keySet()) {
             ParseTree parseTree = parseTrees.get(key);
-            ParseNode rexp = parseTree.getHead().getChildren().get(0);
             if (nfas.get(key) == null) {
-                NFA nfa = parseRexp(rexp);
+                NFA nfa = createNFA(parseTree);
                 nfas.put(key, nfa);
             }
+            System.out.println(key + " " + parseTree.getInputString());
+            System.out.println(nfas.get(key));
+            System.out.println(DFA.createFromNFA(nfas.get(key)) + "\n");
         }
+    }
+
+    private static NFA createNFA(ParseTree parseTree) {
+        return parseRexp(parseTree.getHead().getChildren().get(0));
     }
 
     private static NFA parseRexp(ParseNode rexp) {
