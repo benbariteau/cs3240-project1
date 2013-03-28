@@ -2,6 +2,7 @@ package main;
 
 import main.grammar.EmptyString;
 import main.grammar.EndOfInput;
+import main.grammar.Grammar;
 import main.grammar.Production;
 import main.grammar.Rule;
 import main.grammar.Symbol;
@@ -55,16 +56,16 @@ public class Main {
         Map<String, String> characterClasses = mapList[0];
         Map<String, String> tokens = mapList[1];
 
-        List<Rule> regexRules = createRegexRules();
-        Map<Rule, Map<Symbol, Production>> parseTable = createParseTable(regexRules);
+        Grammar regexRules = createRegexRules();
+        Map<Rule, Map<Symbol, Production>> parseTable = regexRules.createParseTable();
 
         for(String key : characterClasses.keySet()) {
-            ParseTree parseTree = parse(characterClasses.get(key), parseTable, regexRules.get(0));
+            ParseTree parseTree = parse(characterClasses.get(key), parseTable, regexRules.getStartRule());
             classesParseTrees.put(key, parseTree);
         }
 
         for(String key : tokens.keySet()) {
-            ParseTree parseTree = parse(tokens.get(key), parseTable, regexRules.get(0));
+            ParseTree parseTree = parse(tokens.get(key), parseTable, regexRules.getStartRule());
             tokensParseTrees.put(key, parseTree);
         }
 
@@ -356,7 +357,7 @@ public class Main {
         return table;
     }
 
-    private static List<Rule> createRegexRules() {
+    private static Grammar createRegexRules() {
         Rule regEx = new Rule("reg-ex");
         Rule rexp = new Rule("rexp");
         Rule rexpPrime = new Rule("rexp\'");
@@ -462,7 +463,7 @@ public class Main {
         rules.add(RE_CHAR);
         rules.add(RE_CHAR_ESCAPE);
 
-        return rules;
+        return new Grammar(regEx, rules);
     }
 
     private static List<Production> getCharList(Set<Character> escapeCharacters) {
