@@ -1,4 +1,4 @@
-package main;
+package main.parse;
 
 import main.grammar.Rule;
 

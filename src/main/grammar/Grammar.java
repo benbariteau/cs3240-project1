@@ -1,5 +1,7 @@
 package main.grammar;
 
+import main.parse.ParseTable;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +26,7 @@ public class Grammar {
         return startRule;
     }
 
-    public Map<Rule, Map<Symbol, Production>> createParseTable() {
+    public ParseTable createParseTable() {
         Map<Rule, Map<Symbol, Production>> table = new HashMap<Rule, Map<Symbol, Production>>();
         Map<Rule, Set<Symbol>> followSetMap = new HashMap<Rule, Set<Symbol>>();
 
@@ -76,6 +78,6 @@ public class Grammar {
             table.put(rule, productionMap);
         }
 
-        return table;
+        return new ParseTable(table);
     }
 }

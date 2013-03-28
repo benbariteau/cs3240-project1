@@ -1,4 +1,4 @@
-package main;
+package main.parse;
 
 import main.grammar.EmptyString;
 import main.grammar.Rule;
@@ -11,7 +11,7 @@ import java.util.List;
  * A class that represents a singular parse node
  */
 public class ParseNode {
-    Symbol symbol;
+    private Symbol symbol;
     List<ParseNode> children;
     String inputString;
 

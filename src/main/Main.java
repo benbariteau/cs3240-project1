@@ -7,6 +7,9 @@ import main.grammar.Production;
 import main.grammar.Rule;
 import main.grammar.Symbol;
 import main.grammar.Terminal;
+import main.parse.ParseNode;
+import main.parse.ParseTable;
+import main.parse.ParseTree;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -57,15 +60,15 @@ public class Main {
         Map<String, String> tokens = mapList[1];
 
         Grammar regexRules = createRegexRules();
-        Map<Rule, Map<Symbol, Production>> parseTable = regexRules.createParseTable();
+        ParseTable parseTable = regexRules.createParseTable();
 
         for(String key : characterClasses.keySet()) {
-            ParseTree parseTree = parse(characterClasses.get(key), parseTable, regexRules.getStartRule());
+            ParseTree parseTree = parseTable.parse(characterClasses.get(key), regexRules.getStartRule());
             classesParseTrees.put(key, parseTree);
         }
 
         for(String key : tokens.keySet()) {
-            ParseTree parseTree = parse(tokens.get(key), parseTable, regexRules.getStartRule());
+            ParseTree parseTree = parseTable.parse(tokens.get(key), regexRules.getStartRule());
             tokensParseTrees.put(key, parseTree);
         }
 
@@ -132,21 +135,21 @@ public class Main {
     private static NFA getBasicRegex(ParseNode rexp2) {
         List<ParseNode> nodes = rexp2.getChildren();
         ParseNode firstNode = nodes.get(0);
-        if (firstNode.symbol.equals(T('('))) {
+        if (firstNode.getSymbol().equals(T('('))) {
             ParseNode rexp = nodes.get(1);
             NFA unionList = getUnionList(rexp);
             String rexp2tail = nodes.get(3).getInputString();
             return createTailedNFA(unionList, rexp2tail);
-        } else if (firstNode.symbol instanceof Rule && ((Rule) firstNode.symbol).getName().equals("RE_CHAR")) {
+        } else if (firstNode.getSymbol() instanceof Rule && ((Rule) firstNode.getSymbol()).getName().equals("RE_CHAR")) {
             NFA singleCharNFA = null;
             if (firstNode.getChildren().size() == 1) {
-                singleCharNFA = NFA.constructNFAFromCharacter(((Terminal)firstNode.getChildren().get(0).symbol).getCharacter());
+                singleCharNFA = NFA.constructNFAFromCharacter(((Terminal)firstNode.getChildren().get(0).getSymbol()).getCharacter());
             } else {
-                singleCharNFA = NFA.constructNFAFromCharacter(((Terminal)firstNode.getChildren().get(1).getChildren().get(0).symbol).getCharacter());
+                singleCharNFA = NFA.constructNFAFromCharacter(((Terminal)firstNode.getChildren().get(1).getChildren().get(0).getSymbol()).getCharacter());
             }
             String rexp2tail = nodes.get(1).getInputString();
             return createTailedNFA(singleCharNFA, rexp2tail);
-        } else if (firstNode.symbol instanceof Rule && ((Rule) firstNode.symbol).getName().equals("rexp3")) {
+        } else if (firstNode.getSymbol() instanceof Rule && ((Rule) firstNode.getSymbol()).getName().equals("rexp3")) {
             if(!firstNode.hasEmptyChildren()) {
                 return getCharClass(firstNode.getChildren().get(0));
             }
@@ -166,9 +169,9 @@ public class Main {
     private static NFA getCharClass(ParseNode charClass) {
         List<ParseNode> nodes = charClass.getChildren();
         ParseNode firstNode = nodes.get(0);
-        if (firstNode.symbol.equals(T('.'))) {
+        if (firstNode.getSymbol().equals(T('.'))) {
             return NFA.constructNFAFromCharacterSet(printableAscii);
-        } else if (firstNode.symbol.equals(T('['))) {
+        } else if (firstNode.getSymbol().equals(T('['))) {
             return getCharClass1(nodes.get(1));
         } else {
             return getDefinedClass(firstNode);
@@ -198,7 +201,7 @@ public class Main {
 
     private static NFA getCharClass1(ParseNode charClass1) {
         ParseNode node = charClass1.getChildren().get(0);
-        Rule rule = (Rule) node.symbol;
+        Rule rule = (Rule) node.getSymbol();
         if (rule.getName().equals("char-set-list")) {
             return NFA.constructNFAFromCharacterSet(getCharSetList(node));
         } else {
@@ -216,7 +219,7 @@ public class Main {
     private static NFA getExcludeSetTail(ParseNode excludeSetTail) {
         List<ParseNode> nodes = excludeSetTail.getChildren();
         ParseNode firstNode = nodes.get(0);
-        if (firstNode.symbol.equals(T('['))) {
+        if (firstNode.getSymbol().equals(T('['))) {
             return NFA.constructNFAFromCharacterSet(getCharSet(nodes.get(1)));
         } else {
             return getDefinedClass(firstNode);
@@ -226,7 +229,7 @@ public class Main {
     private static Set<Character> getCharSetList(ParseNode charSetList) {
         List<ParseNode> nodes = charSetList.getChildren();
         ParseNode firstNode = nodes.get(0);
-        if(firstNode.symbol.equals(T(']'))) {
+        if(firstNode.getSymbol().equals(T(']'))) {
             return new HashSet<Character>();
         } else {
             Set<Character> charSet = getCharSet(firstNode);
@@ -242,64 +245,18 @@ public class Main {
         List<ParseNode> nodes = charSet.getChildren();
         ParseNode CLS_CHAR = nodes.get(0);
         ParseNode charSetTail = nodes.get(1);
-        Terminal t = (Terminal) CLS_CHAR.getChildren().get(0).symbol;
+        Terminal t = (Terminal) CLS_CHAR.getChildren().get(0).getSymbol();
         char start = t.getCharacter();
         if(charSetTail.hasEmptyChildren()) {
             characters.add(start);
         } else {
-            Terminal e = (Terminal) charSetTail.getChildren().get(1).getChildren().get(0).symbol;
+            Terminal e = (Terminal) charSetTail.getChildren().get(1).getChildren().get(0).getSymbol();
             char end = e.getCharacter();
             for(char i = start; i <= end; i++) {
                 characters.add(i);
             }
         }
         return characters;
-    }
-
-    private static ParseTree parse(String input, Map<Rule, Map<Symbol, Production>> parseTable, Rule startVariable) {
-        ParseTree tree = new ParseTree(startVariable);
-
-        List<Symbol> inputSymbols = stringToSymbolList(input);
-        Deque<ParseNode> parseStack = new ArrayDeque<ParseNode>();
-        parseStack.push(new ParseNode(new EndOfInput()));
-        parseStack.push(tree.getHead());
-
-        while(inputSymbols.size() > 0) {
-            ParseNode top = parseStack.peek();
-            Symbol topSymbol = top.getSymbol();
-            Symbol first = inputSymbols.get(0);
-
-            if (topSymbol instanceof Rule) {
-                Production p = parseTable.get(topSymbol).get(first);
-                parseStack.pop();
-
-                List<ParseNode> parseNodes = p.getParseNodes();
-
-                top.addChildren(parseNodes);
-
-                for (int i = parseNodes.size() - 1; i >= 0; i--) {
-                    ParseNode parseNode = parseNodes.get(i);
-                    if(!(parseNode.getSymbol() instanceof EmptyString)) {
-                        parseStack.push(parseNode);
-                    }
-                }
-            } else {
-                if (first.equals(topSymbol)) {
-                    parseStack.pop();
-                    inputSymbols.remove(0);
-                }
-            }
-        }
-        return tree;
-    }
-
-    private static List<Symbol> stringToSymbolList(String input) {
-        List<Symbol> symbolList = new ArrayList<Symbol>();
-        for(char c : input.toCharArray()) {                                                                                         ;
-            symbolList.add(T(c));
-        }
-        symbolList.add(new EndOfInput());
-        return symbolList;
     }
 
     private static Grammar createRegexRules() {
