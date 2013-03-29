@@ -1,3 +1,4 @@
+%% Comment comment comment...
 $DIGIT [0-9]
 $NON-ZERO [^0] IN $DIGIT
 $CHAR [a-zA-Z]
@@ -9,6 +10,8 @@ $INT ($DIGIT)+
 $FLOAT ($DIGIT)+ \. ($DIGIT)+
 $ASSIGN =
 $PLUS \+
+%% This is a comment!
 $MINUS -
 $MULTIPLY \*
 $PRINT PRINT
+%% Comments ruin everything!
