@@ -29,6 +29,9 @@ public class TestSuite {
 	 * set3 is a set with a complex grammar but a simple input
 	 * set4 is a set with a complex grammar and a complex input (T-Square sample)
 	 * set5 contains a grammar with a lot of comments
+	 * set6 contains a grammar with a comment line instead of a blank line separator
+	 * set7 is a set with no unnecessary whitespace characters
+	 * set8 is a set with a lot of unnecessary whitespace
 	 * 
 	 */
 	@Parameters
@@ -38,7 +41,10 @@ public class TestSuite {
 				{ "resources/set2/SampleGrammar", "resources/set2/SampleInput", "resources/set2/SampleOutput" },
 				{ "resources/set3/SampleGrammar", "resources/set3/SampleInput", "resources/set3/SampleOutput" },
 				{ "resources/set4/SampleGrammar", "resources/set4/SampleInput", "resources/set4/SampleOutput" },
-				{ "resources/set5/SampleGrammar", "resources/set5/SampleInput", "resources/set5/SampleOutput" }
+				{ "resources/set5/SampleGrammar", "resources/set5/SampleInput", "resources/set5/SampleOutput" },
+				{ "resources/set6/SampleGrammar", "resources/set6/SampleInput", "resources/set6/SampleOutput" },
+				{ "resources/set7/SampleGrammar", "resources/set7/SampleInput", "resources/set7/SampleOutput" },
+				{ "resources/set8/SampleGrammar", "resources/set8/SampleInput", "resources/set8/SampleOutput" }
 		};
 		return Arrays.asList(data);
 	}
