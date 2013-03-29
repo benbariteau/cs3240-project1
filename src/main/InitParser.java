@@ -24,7 +24,7 @@ public class InitParser {
 		// Input and scan the grammar file
 		Scanner scannerGrammar = scan(pathToGrammar);
 
-		// Check for comments at the beginning of the file.
+		// Check for comments at the beginning of the file...
 		if(scannerGrammar.hasNext()){
 			int counter = 0;
 			while(scannerGrammar.nextLine().startsWith("%%")){
