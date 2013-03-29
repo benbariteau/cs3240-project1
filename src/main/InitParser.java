@@ -24,6 +24,24 @@ public class InitParser {
 		// Input and scan the grammar file
 		Scanner scannerGrammar = scan(pathToGrammar);
 
+		// Check for comments at the beginning of the file.
+		if(scannerGrammar.hasNext()){
+			int counter = 0;
+			while(scannerGrammar.nextLine().startsWith("%%")){
+				counter = counter + 1;
+			}
+			if(counter == 0){
+				scannerGrammar.reset();
+			}
+			else{
+				int doubleCount = 0;
+				scannerGrammar.reset();
+				while(doubleCount < counter){
+					doubleCount = doubleCount + 1;
+					scannerGrammar.nextLine();
+				}
+			}
+		}
 		// Parse the classes and then the tokens
 		mapClasses = parseClasses(scannerGrammar);
 		mapTokens = parseTokens(scannerGrammar);
@@ -90,6 +108,9 @@ public class InitParser {
 		// Parse for character tokens
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
+			if (line.startsWith("%%")){
+				continue;
+			}
 			Matcher matcher = p.matcher(line);
 			matcher.find();
 			String token = matcher.group(0);
@@ -113,6 +134,10 @@ public class InitParser {
 			String line = scanner.nextLine();
 			if (line.trim().equals("")) {
 				// A blank line means switch to the token parsing
+				break;
+			}
+			else if(line.startsWith("%%")){
+				// A comment means switch to the token parsing
 				break;
 			}
 			Matcher matcher = p.matcher(line);
