@@ -1,0 +1,9 @@
+How to build project:
+1) Make sure ant is installed and in your PATH
+2) Run the following command:
+	ant all
+
+How to run (after building):
+1) Run the following command:
+	java -jar jar/scanner.jar path/to/grammar/file path/to/input/file
+2) The token pairs will be printed to standard out and the dfa table will be output in dfa.csv
