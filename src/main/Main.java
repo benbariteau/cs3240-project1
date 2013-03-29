@@ -61,6 +61,7 @@ public class Main {
         ParseTable parseTable = regexRules.createParseTable();
 
         for(String key : characterClasses.keySet()) {
+        	//YOU ARE HERE
             ParseTree parseTree = parseTable.parse(characterClasses.get(key), regexRules.getStartRule());
             classesParseTrees.put(key, parseTree);
         }
