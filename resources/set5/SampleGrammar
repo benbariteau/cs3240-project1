@@ -1,11 +1,8 @@
 %% An evil comment.
 $DIGIT [0-9]
-%% Comments ruin everything!
 $NON-ZERO [^0] IN $DIGIT
 $CHAR [a-zA-Z]
 $UPPER [^a-z] IN $CHAR
-%% Comment comment comment...
-%% Comments ruin everything!
 $LOWER [^A-Z] IN $CHAR
 %% This is a devious comment.
 $IDENTIFIER $LOWER ($LOWER|$DIGIT)*
