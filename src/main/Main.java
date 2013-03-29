@@ -98,9 +98,6 @@ public class Main {
                 NFA nfa = createNFA(parseTree);
                 nfas.put(key, nfa);
             }
-            System.out.println(key + " " + parseTree.getInputString());
-            System.out.println(nfas.get(key));
-            System.out.println(DFA.createFromNFA(nfas.get(key)) + "\n");
         }
     }
 
