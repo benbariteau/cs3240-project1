@@ -86,6 +86,7 @@ public class Main {
         // TODO - Run DFA on input tokens
         
         // TODO - Output the token-input string pairs
+        
 	}
 	
 	private static void combineNFAs()
