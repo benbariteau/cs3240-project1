@@ -1,10 +1,16 @@
 package main;
 
+/**
+ * A class that represents a state
+ */
 public class State {
     String name;
 
     static int stateNum = 0;
 
+    /**
+     * Constructor for the state
+     */
     public State() {
         this.name = "" + stateNum++;
     }
@@ -34,4 +40,5 @@ public class State {
     public int hashCode() {
         return name != null ? name.hashCode() : 0;
     }
+    
 }
