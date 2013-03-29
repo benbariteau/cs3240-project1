@@ -80,11 +80,14 @@ public class Main {
         
         dfa = DFA.createFromNFA(bigNFA);
         
-		// TODO - input the input file
-
-		// TODO - Determine parse tree
-
-		// TODO - Create output based on input
+		// TODO - Create DFA that recognizes tokens
+        
+        // TODO - Split input on spaces (?)
+        
+        // TODO - Run DFA on input tokens
+        
+        // TODO - Output the token-input string pairs
+        
 	}
 	
 	private static void combineNFAs()
