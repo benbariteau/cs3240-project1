@@ -1,5 +1,6 @@
 package main;
 
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -83,6 +84,56 @@ public class LabelledDFA {
         s += "}";
 
         return s;
+    }
+    
+    /**
+     * Write the DFA as a CSV file
+     */
+    public void createCSV(String filepath)
+    {
+    	Map<State, Map<Character, State>> table = dfa.table;
+    	State startState = dfa.startState;
+    	Set<State> acceptStates = dfa.acceptStates;
+    	try
+    	{
+    		FileWriter writer = new FileWriter(filepath);
+    		Character[] cArray = new Character[]{' ','!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', '-', '.', '/',
+    	            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C',
+    	            'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+    	            'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
+    	            'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~'};
+    		writer.write("State,");
+    		for (Character c : cArray)
+    		{
+    			if(c == '\"')
+    				writer.write("\"\",");
+    			else if (c == ',')
+    				writer.write("\",\",");
+    			else
+    				writer.write(c + ",");
+    		}
+    		writer.write("\n");
+            for (State state : table.keySet()) 
+            {
+            	
+                boolean st = state == startState;
+                boolean a = acceptStates.contains(state);
+                writer.write((st?"Start State > ":"") + (a?"Accept State: ":"") +state.toString().replaceAll(",", "+") + " ,");
+
+                Map<Character, State> transitions = table.get(state);
+                for (Character c : cArray) 
+                {
+                    writer.write(transitions.get(c).toString().replaceAll(",","+") + ",");
+                }
+                writer.write("\n");
+            }
+            writer.flush();
+            writer.close();
+    	}
+    	catch(Exception e)
+    	{
+    		System.out.println("I/O error in DFA table output: "+e);
+    	}
     }
 
     public String getLastToken() {
