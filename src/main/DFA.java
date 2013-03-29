@@ -2,6 +2,7 @@ package main;
 
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,8 +14,10 @@ import java.util.Set;
  */
 public class DFA {
     State startState;
+    State currentState;
     Map<State, Map<Character, State>> table;
     Set<State> acceptStates;
+    private HashMap<Set<State>, State> dfaMap;
 
     /**
      * Constructor for the DFA
@@ -61,7 +64,7 @@ public class DFA {
             newStates = newNewStates;
         }
 
-        Map<Set<State>, State> dfaMap = new HashMap<Set<State>, State>();
+        dfa.dfaMap = new HashMap<Set<State>, State>();
         for (Set<State> s : dfaStates.keySet()) {
             boolean isAccept = false;
             String name = "{";
@@ -71,19 +74,19 @@ public class DFA {
             }
             name += "}";
             State state = new State(name);
-            dfaMap.put(s, state);
+            dfa.dfaMap.put(s, !s.isEmpty() ? state : null);
             if (isAccept) {
                 dfa.acceptStates.add(state);
             }
         }
 
-        dfa.startState = dfaMap.get(startState);
+        dfa.startState = dfa.dfaMap.get(startState);
         for (Set<State> key : preTable.keySet()) {
             Map<Character, State> transitions = new HashMap<Character, State>();
             for (Character c : preTable.get(key).keySet()) {
-                transitions.put(c, dfaMap.get(preTable.get(key).get(c)));
+                transitions.put(c, dfa.dfaMap.get(preTable.get(key).get(c)));
             }
-            dfa.table.put(dfaMap.get(key), transitions);
+            dfa.table.put(dfa.dfaMap.get(key), transitions);
         }
 
         return dfa;
@@ -208,5 +211,14 @@ public class DFA {
     		System.out.println("I/O error in DFA table output: "+e);
     	}
     }
-    
+
+    public static DFA createFromNFAs(Collection<NFA> nfas) {
+        NFA compositeNFA = NFA.unionNFAs(nfas);
+
+        return DFA.createFromNFA(compositeNFA);
+    }
+
+    public HashMap<Set<State>, State> getDfaMap() {
+        return dfaMap;
+    }
 }

@@ -1,54 +1,31 @@
 package test;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.Collection;
+import java.io.IOException;
 import java.util.Scanner;
-
-import main.Main;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 
 /*
  * Parameterized test cases - the set of tests run over all input parameters
  */
-@RunWith(value = Parameterized.class)
-public class TestSuite {
+public abstract class TestSuite {
 
-	/*
-	 * The list of parameter groups to use for the tests
-	 * set0 is a set with a simple grammar and a simple input
-	 * set1 is a set with a simple grammar but a complex input
-	 * set2 is a set with a complex grammar but a simple input
-	 * set3 is a set with a complex grammar and a complex input (T-Square sample)
-	 * set4 contains a grammar with a lot of comments
-	 * set5 contains a grammar with a comment line instead of a blank line separator
-	 * set6 is a set with no unnecessary whitespace characters
-	 * set7 is a set with a lot of unnecessary whitespace
-	 * 
-	 */
-	@Parameters
-	public static Collection<Object[]> data() {
-		Object[][] data = new Object[][] { 
-				{ "resources/set0/SampleGrammar", "resources/set0/SampleInput", "resources/set0/SampleOutput" },
-				{ "resources/set1/SampleGrammar", "resources/set1/SampleInput", "resources/set1/SampleOutput" },
-				{ "resources/set2/SampleGrammar", "resources/set2/SampleInput", "resources/set2/SampleOutput" },
-				{ "resources/set3/SampleGrammar", "resources/set3/SampleInput", "resources/set3/SampleOutput" },
-				{ "resources/set4/SampleGrammar", "resources/set4/SampleInput", "resources/set4/SampleOutput" },
-				{ "resources/set5/SampleGrammar", "resources/set5/SampleInput", "resources/set5/SampleOutput" },
-				{ "resources/set6/SampleGrammar", "resources/set6/SampleInput", "resources/set6/SampleOutput" },
-				{ "resources/set7/SampleGrammar", "resources/set7/SampleInput", "resources/set7/SampleOutput" }
-		};
-		return Arrays.asList(data);
-	}
+	// Localized file paths
+	protected String pathGrammar = "";
 
+	protected String pathInput = "";
+
+	private String pathOutput = "";
+
+	// The actual files
+	private File fileGrammar, fileInput, fileOutput;
+
+	// The texts contained within the files
+	protected String textOutput = "";
+	
 	/*
 	 * Constructor for the run of tests
 	 */
@@ -57,15 +34,6 @@ public class TestSuite {
 		this.pathInput = pathInput;
 		this.pathOutput = pathOutput;
 	 }
-	
-	// Localized file paths
-	private String pathGrammar = "", pathInput = "", pathOutput = "";
-
-	// The actual files
-	private File fileGrammar, fileInput, fileOutput;
-
-	// The texts contained within the files
-	private final String textGrammar = "", textInput = "", textOutput = "";
 
 	/*
 	 * Setup the test environment
@@ -95,17 +63,16 @@ public class TestSuite {
 		System.out.println(fileGrammar.getAbsolutePath());
 		System.out.println(fileInput.getAbsolutePath());
 		System.out.println(fileOutput.getAbsolutePath() + "\n");
-		displayFile(fileGrammar, textGrammar);
-		displayFile(fileInput, textInput);
-		displayFile(fileOutput, textOutput);
+		textOutput = displayFile(fileOutput);
 	}
 
 	/*
 	 * Displays the file name and the contents to output
 	 * Also initializes the text contents of each file
 	 */
-	private void displayFile(File file, String text) {
+	private String displayFile(File file) {
 		// Read in the file contents
+        String text = "";
 		Scanner scanner = null;
 		try {
 			scanner = new Scanner(file);
@@ -124,6 +91,7 @@ public class TestSuite {
 		// Print the final string which represents the sum file contents
 		System.out.println(file.getName() + ":\n" + text);
 		scanner.close();
+        return text;
 	}
 
 	/*
@@ -135,9 +103,5 @@ public class TestSuite {
 	 * A single correct run
 	 */
 	@Test
-	public void test_all() {
-		Main.main(new String[] { pathGrammar, pathInput });
-		assertTrue(true);
-	}
-
+	public abstract void test_all() throws IOException;
 }

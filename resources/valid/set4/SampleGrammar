@@ -1,0 +1,17 @@
+%% Comment comment comment...
+$DIGIT [0-9]
+$NON-ZERO [^0] IN $DIGIT
+$CHAR [a-zA-Z]
+$UPPER [^a-z] IN $CHAR
+$LOWER [^A-Z] IN $CHAR
+
+$IDENTIFIER $LOWER ($LOWER|$DIGIT)*
+$INT ($DIGIT)+
+$FLOAT ($DIGIT)+ \. ($DIGIT)+
+$ASSIGN =
+$PLUS \+
+%% This is a comment!
+$MINUS -
+$MULTIPLY \*
+$PRINT PRINT
+%% Comments ruin everything!

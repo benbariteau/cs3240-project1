@@ -9,28 +9,41 @@ import main.parse.ParseNode;
 import main.parse.ParseTable;
 import main.parse.ParseTree;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 public class Main {
 
-	private static Map<String, String> mapClasses, mapTokens;
-	private static String pathToGrammar, pathToInput;
+	private Map<String, String> mapClasses, mapTokens;
+	private String pathToGrammar, pathToInput;
     static Set<Character> printableAscii = new HashSet<Character>(Arrays.asList(' ', '!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C',
             'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
             'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
             'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~'));
-    static Map<String, NFA> nfas = new HashMap<String, NFA>();
-    static NFA bigNFA;
-    static DFA dfa;
-    static Map<String, ParseTree> classesParseTrees =  new HashMap<String, ParseTree>();
-    static Map<String, ParseTree> tokensParseTrees = new HashMap<String, ParseTree>();
+    Map<String, NFA> nfas = new HashMap<String, NFA>();
+    NFA bigNFA;
+    DFA dfa;
+    Map<String, ParseTree> classesParseTrees =  new HashMap<String, ParseTree>();
+    Map<String, ParseTree> tokensParseTrees = new HashMap<String, ParseTree>();
+
+    public static void main(String[] args) throws IOException {
+        System.out.println(new Main().run(args));
+    }
 
 	/*
 	 * Main method and driver of the program
@@ -39,7 +52,7 @@ public class Main {
 	 * 
 	 * @arg[1] Input
 	 */
-	public static void main(String[] args) {
+	public String run(String[] args) throws IOException {
 
 		// Ensure proper input parameters
 		inputValidation(args);
@@ -78,7 +91,19 @@ public class Main {
         combineNFAs();
         
         dfa = DFA.createFromNFA(bigNFA);
-        
+
+        Map<NFA, String> tokenNFAs = new HashMap<NFA, String>();
+        for (String token : tokensParseTrees.keySet()) {
+            tokenNFAs.put(nfas.get(token), token.substring(1));
+        }
+        LabelledDFA ldfa = LabelledDFA.createFromNFAs(tokenNFAs);
+
+        File inputFile = new File(pathToInput);
+
+        Reader r = new InputStreamReader(new FileInputStream(inputFile), Charset.defaultCharset());
+
+        return parseInput(ldfa, r);
+
 		// TODO - Create DFA that recognizes tokens
         
         // TODO - Split input on spaces (?)
@@ -86,33 +111,57 @@ public class Main {
         // TODO - Run DFA on input tokens
         
         // TODO - Output the token-input string pairs
-        
 	}
-	
-	private static void combineNFAs()
+
+    private String parseInput(LabelledDFA ldfa, Reader r) throws IOException {
+        String out = "";
+        String buffer = "";
+        int val = r.read();
+        while (val != -1) {
+            char c = (char) val;
+            Set<Integer> statuses = ldfa.next(c);
+
+            if (statuses.contains(LabelledDFA.TOKEN_END)) {
+                out += ldfa.getLastToken() + " " + buffer + System.getProperty("line.separator");
+                buffer = "";
+            }
+
+            if (statuses.contains(LabelledDFA.REGALAR)) {
+                buffer += c;
+            }
+
+            val = r.read();
+        }
+        return out;
+    }
+
+    private void combineNFAs()
 	{
 		bigNFA = NFA.unionNFAs(nfas.values());
 	}
 
-    private static void createNFAs(Map<String, ParseTree> parseTrees) {
+    private void createNFAs(Map<String, ParseTree> parseTrees) {
         for (String key : parseTrees.keySet()) {
             ParseTree parseTree = parseTrees.get(key);
             if (nfas.get(key) == null) {
                 NFA nfa = createNFA(parseTree);
                 nfas.put(key, nfa);
             }
+//            System.out.println(key + " " + parseTree.getInputString());
+//            System.out.println(nfas.get(key));
+//            System.out.println(DFA.createFromNFA(nfas.get(key)) + "\n");
         }
     }
 
-    private static NFA createNFA(ParseTree parseTree) {
+    private NFA createNFA(ParseTree parseTree) {
         return parseRexp(parseTree.getHead().getChildren().get(0));
     }
 
-    private static NFA parseRexp(ParseNode rexp) {
+    private NFA parseRexp(ParseNode rexp) {
         return getUnionList(rexp);
     }
 
-    private static NFA getUnionList(ParseNode rexp) {
+    private NFA getUnionList(ParseNode rexp) {
         List<ParseNode> nodes = rexp.getChildren();
         ParseNode rexp1 = nodes.get(0);
         ParseNode rexpPrime = nodes.get(1);
@@ -124,7 +173,7 @@ public class Main {
         return contactList;
     }
 
-    private static NFA getUnionRHS(ParseNode rexpPrime) {
+    private NFA getUnionRHS(ParseNode rexpPrime) {
         List<ParseNode> nodes = rexpPrime.getChildren();
         ParseNode rexp1 = nodes.get(1);
         ParseNode rexpPrime2 = nodes.get(2);
@@ -136,7 +185,7 @@ public class Main {
         return concatList;
     }
 
-    private static NFA getConcatList(ParseNode rexp1) {
+    private NFA getConcatList(ParseNode rexp1) {
         List<ParseNode> nodes = rexp1.getChildren();
         ParseNode rexp2 = nodes.get(0);
         ParseNode rexp1Prime = nodes.get(1);
@@ -148,7 +197,7 @@ public class Main {
         return basicNFA;
     }
 
-    private static NFA getBasicRegex(ParseNode rexp2) {
+    private NFA getBasicRegex(ParseNode rexp2) {
         List<ParseNode> nodes = rexp2.getChildren();
         ParseNode firstNode = nodes.get(0);
         if (firstNode.getSymbol().equals(T('('))) {
@@ -173,7 +222,7 @@ public class Main {
         return new NFA();
     }
 
-    private static NFA createTailedNFA(NFA nfa, String rexp2tail) {
+    private NFA createTailedNFA(NFA nfa, String rexp2tail) {
         if (rexp2tail.equals("*")) {
             return nfa.createStarNFA();
         } else if(rexp2tail.equals("+")) {
@@ -182,7 +231,7 @@ public class Main {
         return nfa;
     }
 
-    private static NFA getCharClass(ParseNode charClass) {
+    private NFA getCharClass(ParseNode charClass) {
         List<ParseNode> nodes = charClass.getChildren();
         ParseNode firstNode = nodes.get(0);
         if (firstNode.getSymbol().equals(T('.'))) {
@@ -194,12 +243,12 @@ public class Main {
         }
     }
 
-    private static NFA getDefinedClass(ParseNode definedClass) {
+    private NFA getDefinedClass(ParseNode definedClass) {
         String classId = definedClass.getInputString();
         return getNFA(classId);
     }
 
-    private static NFA getNFA(String classId) {
+    private NFA getNFA(String classId) {
         NFA nfa = nfas.get(classId);
         if (nfa == null) {
             ParseTree classTree = classesParseTrees.get(classId);
@@ -215,7 +264,7 @@ public class Main {
         return nfas.get(classId).clone();
     }
 
-    private static NFA getCharClass1(ParseNode charClass1) {
+    private NFA getCharClass1(ParseNode charClass1) {
         ParseNode node = charClass1.getChildren().get(0);
         Rule rule = (Rule) node.getSymbol();
         if (rule.getName().equals("char-set-list")) {
@@ -225,14 +274,14 @@ public class Main {
         }
     }
 
-    private static NFA getExcludeSet(ParseNode excludeSet) {
+    private NFA getExcludeSet(ParseNode excludeSet) {
         List<ParseNode> nodes = excludeSet.getChildren();
         Set<Character> charSet = getCharSet(nodes.get(1));
         NFA excludeSetTail = getExcludeSetTail(nodes.get(7));
         return excludeSetTail.excludeCharacters(charSet);
     }
 
-    private static NFA getExcludeSetTail(ParseNode excludeSetTail) {
+    private NFA getExcludeSetTail(ParseNode excludeSetTail) {
         List<ParseNode> nodes = excludeSetTail.getChildren();
         ParseNode firstNode = nodes.get(0);
         if (firstNode.getSymbol().equals(T('['))) {
@@ -242,7 +291,7 @@ public class Main {
         }
     }
 
-    private static Set<Character> getCharSetList(ParseNode charSetList) {
+    private Set<Character> getCharSetList(ParseNode charSetList) {
         List<ParseNode> nodes = charSetList.getChildren();
         ParseNode firstNode = nodes.get(0);
         if(firstNode.getSymbol().equals(T(']'))) {
@@ -255,7 +304,7 @@ public class Main {
         }
     }
 
-    private static Set<Character> getCharSet(ParseNode charSet) {
+    private Set<Character> getCharSet(ParseNode charSet) {
         Set<Character> characters = new HashSet<Character>();
 
         List<ParseNode> nodes = charSet.getChildren();
@@ -275,7 +324,7 @@ public class Main {
         return characters;
     }
 
-    private static Grammar createRegexRules() {
+    private Grammar createRegexRules() {
         Rule regEx = new Rule("reg-ex");
         Rule rexp = new Rule("rexp");
         Rule rexpPrime = new Rule("rexp\'");
@@ -384,7 +433,7 @@ public class Main {
         return new Grammar(regEx, rules);
     }
 
-    private static List<Production> getCharList(Set<Character> escapeCharacters) {
+    private List<Production> getCharList(Set<Character> escapeCharacters) {
         List<Production> productions = new ArrayList<Production>();
         for (char c : escapeCharacters) {
             productions.add(new Production(T(c)));
@@ -392,7 +441,7 @@ public class Main {
         return productions;
     }
 
-    private static List<Production> getCharList(Set<Character> charSet, Set<Character> escapedCharacters) {
+    private List<Production> getCharList(Set<Character> charSet, Set<Character> escapedCharacters) {
         List<Production> charList = new ArrayList<Production>();
         for(char c : charSet) {
             if (escapedCharacters.contains(c)) {
@@ -403,14 +452,14 @@ public class Main {
         return charList;
     }
 
-    private static Terminal T(char c) {
+    private Terminal T(char c) {
         return new Terminal(c);
     }
 
     /*
      * Test inputs to ensure validity
      */
-	private static void inputValidation(String[] args) {
+	private void inputValidation(String[] args) {
 		// Must have two argument inputs - grammar and sample input
 		if (args.length != 2) {
 			System.out.println("Invalid parameters. Try:\njava Main <path/to/grammar> <path/to/input>");
