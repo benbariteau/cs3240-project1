@@ -170,6 +170,7 @@ public class DFA {
      */
     public void createCSV(String filepath)
     {
+        State nullState = new State("{}");
     	try
     	{
     		FileWriter writer = new FileWriter(filepath);
@@ -191,15 +192,17 @@ public class DFA {
     		writer.write("\n");
             for (State state : table.keySet()) 
             {
-            	
+
                 boolean st = state == startState;
                 boolean a = acceptStates.contains(state);
-                writer.write((st?"Start State > ":"") + (a?"Accept State: ":"") +state.toString().replaceAll(",", "+") + " ,");
+                writer.write((st?"Start State > ":"") + (a?"Accept State: ":"") + (state == null ? nullState.toString() :state.toString().replaceAll(",", "+")) + " ,");
 
                 Map<Character, State> transitions = table.get(state);
                 for (Character c : cArray) 
                 {
-                    writer.write(transitions.get(c).toString().replaceAll(",","+") + ",");
+                    State s = transitions.get(c);
+                    s = s == null ? nullState : s;
+                    writer.write(s.toString().replaceAll(",","+") + ",");
                 }
                 writer.write("\n");
             }
@@ -208,7 +211,8 @@ public class DFA {
     	}
     	catch(Exception e)
     	{
-    		System.out.println("I/O error in DFA table output: "+e);
+    		System.out.println("I/O error in DFA table output: ");
+            e.printStackTrace();
     	}
     }
 
