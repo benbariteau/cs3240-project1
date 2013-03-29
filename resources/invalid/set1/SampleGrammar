@@ -1,5 +1,5 @@
 $DIGIT [0-9]
-$CHAR [a-zA-Z]
+$CHAR [A-Z]
 
 $IDENTIFIER $CHAR ($CHAR|$DIGIT)*
 $INT ($DIGIT)+
