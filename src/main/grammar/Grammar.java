@@ -8,10 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A class that represents a grammar
+ */
 public class Grammar {
     Rule startRule;
     List<Rule> rules;
 
+    /**
+     * Constructor for the grammar
+     */
     public Grammar(Rule startRule, List<Rule> rules) {
         this.startRule = startRule;
         this.rules = rules;
@@ -22,10 +28,16 @@ public class Grammar {
         }
     }
 
+    /**
+     * Returns the start rule of the grammar
+     */
     public Rule getStartRule() {
         return startRule;
     }
 
+    /**
+     * Builds a parse table from the grammar
+     */
     public ParseTable createParseTable() {
         Map<Rule, Map<Symbol, Production>> table = new HashMap<Rule, Map<Symbol, Production>>();
         Map<Rule, Set<Symbol>> followSetMap = new HashMap<Rule, Set<Symbol>>();
@@ -80,4 +92,5 @@ public class Grammar {
 
         return new ParseTable(table);
     }
+    
 }

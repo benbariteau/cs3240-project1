@@ -8,16 +8,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A class that represents a DFA
+ */
 public class DFA {
     State startState;
     Map<State, Map<Character, State>> table;
     Set<State> acceptStates;
 
+    /**
+     * Constructor for the DFA
+     */
     public DFA() {
         table = new HashMap<State, Map<Character, State>>();
         acceptStates = new HashSet<State>();
     }
 
+    /**
+     * Create the DFA from already existing NFA
+     */
     public static DFA createFromNFA(NFA nfa) {
         DFA dfa = new DFA();
 
@@ -80,12 +89,18 @@ public class DFA {
         return dfa;
     }
 
+    /**
+     * Return the set of epsilon states using an NFA and state as input
+     */
     private static Set<State> getEpsilonStateSet(NFA nfa, State state) {
         Set<State> stateSet = new HashSet<State>();
         stateSet.add(state);
         return getEpsilonStateSet(nfa, stateSet);
     }
-
+    
+    /**
+     * Return the set of epsilon states using an NFA and a set of states as input
+     */
     private static Set<State> getEpsilonStateSet(NFA nfa, Set<State> states) {
         Set<State> stateSet = new HashSet<State>();
         for (State state : states) {
@@ -104,6 +119,9 @@ public class DFA {
         return stateSet;
     }
 
+    /**
+     * Return set of states for a transition character
+     */
     private static Set<State> getStateSet(NFA nfa, Set<State> states, Character transition) {
         Set<State> stateSet = new HashSet<State>();
        for (State state : states) {
@@ -118,6 +136,9 @@ public class DFA {
         return stateSet;
     }
 
+    /**
+     * Convert this DFA to a string
+     */
     @Override
     public String toString() {
         String s = "";
@@ -141,6 +162,9 @@ public class DFA {
         return s;
     }
     
+    /**
+     * Write the DFA as a CSV file
+     */
     public void createCSV(String filepath)
     {
     	try
@@ -183,7 +207,6 @@ public class DFA {
     	{
     		System.out.println("I/O error in DFA table output: "+e);
     	}
-    	
-    	
     }
+    
 }

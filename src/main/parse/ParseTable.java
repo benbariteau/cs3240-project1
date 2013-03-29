@@ -13,13 +13,22 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A class that represents a parse table
+ */
 public class ParseTable {
     Map<Rule, Map<Symbol, Production>> table;
 
+    /**
+     * Constructor for the parse table
+     */
     public ParseTable(Map<Rule, Map<Symbol, Production>> table) {
         this.table = table;
     }
 
+    /**
+     * Parse the input string
+     */
     public ParseTree parse(String input, Rule startVariable) {
         ParseTree tree = new ParseTree(startVariable);
 
@@ -57,6 +66,9 @@ public class ParseTable {
         return tree;
     }
 
+    /**
+     * Convert the string inpout to a list of Symbols
+     */
     private static List<Symbol> stringToSymbolList(String input) {
         List<Symbol> symbolList = new ArrayList<Symbol>();
         for(char c : input.toCharArray()) {                                                                                         ;
@@ -65,4 +77,5 @@ public class ParseTable {
         symbolList.add(new EndOfInput());
         return symbolList;
     }
+    
 }

@@ -33,9 +33,9 @@ public class TestSuite {
 	@Parameters
 	public static Collection<Object[]> data() {
 		Object[][] data = new Object[][] { 
-				{ "resources/set1/SampleGrammar", "resources/set1/SampleInput", "resources/set1/SampleOutput" },
-				{ "resources/set2/SampleGrammar", "resources/set2/SampleInput", "resources/set2/SampleOutput" },
-				{ "resources/set3/SampleGrammar", "resources/set3/SampleInput", "resources/set3/SampleOutput" },
+				//{ "resources/set1/SampleGrammar", "resources/set1/SampleInput", "resources/set1/SampleOutput" },
+				//{ "resources/set2/SampleGrammar", "resources/set2/SampleInput", "resources/set2/SampleOutput" },
+				//{ "resources/set3/SampleGrammar", "resources/set3/SampleInput", "resources/set3/SampleOutput" },
 				{ "resources/set4/SampleGrammar", "resources/set4/SampleInput", "resources/set4/SampleOutput" }
 		};
 		return Arrays.asList(data);
@@ -123,8 +123,6 @@ public class TestSuite {
 	 * TEST CASES
 	 */
 
-	// TODO - populate with test cases
-	
 	/*
 	 * A single correct run
 	 */
