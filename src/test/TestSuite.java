@@ -66,7 +66,7 @@ public class TestSuite {
 	private File fileGrammar, fileInput, fileOutput;
 
 	// The texts contained within the files
-	private final String textGrammar = "", textInput = "", textOutput = "";
+	private String textGrammar = "", textInput = "", textOutput = "";
 
 	/*
 	 * Setup the test environment
@@ -96,17 +96,18 @@ public class TestSuite {
 		System.out.println(fileGrammar.getAbsolutePath());
 		System.out.println(fileInput.getAbsolutePath());
 		System.out.println(fileOutput.getAbsolutePath() + "\n");
-		displayFile(fileGrammar, textGrammar);
-		displayFile(fileInput, textInput);
-		displayFile(fileOutput, textOutput);
+		textGrammar = displayFile(fileGrammar);
+		textInput = displayFile(fileInput);
+		textOutput = displayFile(fileOutput);
 	}
 
 	/*
 	 * Displays the file name and the contents to output
 	 * Also initializes the text contents of each file
 	 */
-	private void displayFile(File file, String text) {
+	private String displayFile(File file) {
 		// Read in the file contents
+        String text = "";
 		Scanner scanner = null;
 		try {
 			scanner = new Scanner(file);
@@ -125,6 +126,7 @@ public class TestSuite {
 		// Print the final string which represents the sum file contents
 		System.out.println(file.getName() + ":\n" + text);
 		scanner.close();
+        return text;
 	}
 
 	/*
@@ -137,7 +139,9 @@ public class TestSuite {
 	 */
 	@Test
 	public void test_all() throws IOException {
-		Main.main(new String[] { pathGrammar, pathInput });
+		String s = new Main().run(new String[] { pathGrammar, pathInput });
+        System.out.println(s);
+        assertTrue(s.equals(textOutput));
 		assertTrue(true);
 	}
 
