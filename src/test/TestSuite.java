@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Scanner;
@@ -135,7 +136,7 @@ public class TestSuite {
 	 * A single correct run
 	 */
 	@Test
-	public void test_all() {
+	public void test_all() throws IOException {
 		Main.main(new String[] { pathGrammar, pathInput });
 		assertTrue(true);
 	}

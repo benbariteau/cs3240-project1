@@ -9,12 +9,21 @@ import main.parse.ParseNode;
 import main.parse.ParseTable;
 import main.parse.ParseTree;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 public class Main {
@@ -39,7 +48,7 @@ public class Main {
 	 * 
 	 * @arg[1] Input
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		// Ensure proper input parameters
 		inputValidation(args);
@@ -79,7 +88,19 @@ public class Main {
         combineNFAs();
         
         dfa = DFA.createFromNFA(bigNFA);
-        
+
+        Map<NFA, String> tokenNFAs = new HashMap<NFA, String>();
+        for (String token : tokensParseTrees.keySet()) {
+            tokenNFAs.put(nfas.get(token), token);
+        }
+        LabelledDFA ldfa = LabelledDFA.createFromNFAs(tokenNFAs);
+
+        File inputFile = new File(pathToInput);
+
+        Reader r = new InputStreamReader(new FileInputStream(inputFile), Charset.defaultCharset());
+
+        parseInput(ldfa, r);
+
 		// TODO - Create DFA that recognizes tokens
         
         // TODO - Split input on spaces (?)
@@ -87,10 +108,29 @@ public class Main {
         // TODO - Run DFA on input tokens
         
         // TODO - Output the token-input string pairs
-        
 	}
-	
-	private static void combineNFAs()
+
+    private static void parseInput(LabelledDFA ldfa, Reader r) throws IOException {
+        String buffer = "";
+        int val = r.read();
+        while (val != -1) {
+            char c = (char) val;
+            Set<Integer> statuses = ldfa.next(c);
+
+            if (statuses.contains(LabelledDFA.TOKEN_END)) {
+                System.out.println(ldfa.getLastToken() + " " + buffer);
+                buffer = "";
+            }
+
+            if (statuses.contains(LabelledDFA.REGALAR)) {
+                buffer += c;
+            }
+
+            val = r.read();
+        }
+    }
+
+    private static void combineNFAs()
 	{
 		bigNFA = NFA.unionNFAs(nfas.values());
 	}
@@ -102,6 +142,9 @@ public class Main {
                 NFA nfa = createNFA(parseTree);
                 nfas.put(key, nfa);
             }
+//            System.out.println(key + " " + parseTree.getInputString());
+//            System.out.println(nfas.get(key));
+//            System.out.println(DFA.createFromNFA(nfas.get(key)) + "\n");
         }
     }
 
