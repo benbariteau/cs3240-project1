@@ -31,11 +31,11 @@ public class InitParser {
 				counter = counter + 1;
 			}
 			if(counter == 0){
-				scannerGrammar.reset();
+				scannerGrammar = scan(pathToGrammar);
 			}
 			else{
 				int doubleCount = 0;
-				scannerGrammar.reset();
+				scannerGrammar = scan(pathToGrammar);
 				while(doubleCount < counter){
 					doubleCount = doubleCount + 1;
 					scannerGrammar.nextLine();
