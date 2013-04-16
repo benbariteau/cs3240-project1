@@ -9,10 +9,8 @@ import main.parse.ParseNode;
 import main.parse.ParseTable;
 import main.parse.ParseTree;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -23,13 +21,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 
 public class Main {
 
 	private Map<String, String> mapClasses, mapTokens;
-	private String pathToGrammar, pathToInput;
+	private String pathToGrammar, pathToInput, pathToTokenSpec;
     static Set<Character> printableAscii = new HashSet<Character>(Arrays.asList(' ', '!', '\"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C',
             'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
@@ -59,13 +56,14 @@ public class Main {
 
 		// The two file paths (grammar and input file respectively)
 		pathToGrammar = args[0];
-		pathToInput = args[1];
+        pathToTokenSpec = args[1];
+		pathToInput = args[2];
 
 		// Input and scan the grammar file
 		Map<String, String>[] mapList = new Map[2];
 		// Parse the classes and then the tokens
 		InitParser initParse = new InitParser();
-		mapList = initParse.parse(pathToGrammar, pathToInput);
+		mapList = initParse.parse(pathToTokenSpec);
 
         Map<String, String> characterClasses = mapList[0];
         Map<String, String> tokens = mapList[1];
@@ -462,8 +460,8 @@ public class Main {
      */
 	private void inputValidation(String[] args) {
 		// Must have two argument inputs - grammar and sample input
-		if (args.length != 2) {
-			System.out.println("Invalid parameters. Try:\njava Main <path/to/grammar> <path/to/input>");
+		if (args.length != 3) {
+			System.out.println("Invalid parameters. Try:\njava Main <path/to/grammar> <path/to/token/spec> <path/to/input>");
 			System.exit(-1);
 		}
 	}

@@ -19,7 +19,7 @@ public class InitParser {
 	private Map<String, String> mapClasses, mapTokens;
 	private String output;
 
-	Map<String, String>[] parse(String pathToGrammar, String pathToInput) {
+	Map<String, String>[] parse(String pathToGrammar) {
 		// Input and scan the grammar file
 		Scanner scannerGrammar = scan(pathToGrammar);
 
