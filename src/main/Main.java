@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 public class Main {
@@ -57,6 +58,9 @@ public class Main {
 		pathToGrammar = args[0];
         pathToTokenSpec = args[1];
 		pathToInput = args[2];
+
+        Grammar grammar = new GrammarParser().parse(new Scanner(new File(pathToGrammar)));
+        System.out.println(grammar);
 
 		// Input and scan the token file
 		TokenParser initParse = new TokenParser();
@@ -196,11 +200,7 @@ public class Main {
     private NFA getNFA(String classId) {
         NFA nfa = nfas.get(classId);
         if (nfa == null) {
-            ParseTree classTree = classesParseTrees.get(classId);
             ParseTree tokenTree = tokensParseTrees.get(classId);
-            if(classTree != null) {
-                nfas.put(classId, parseRexp(classTree.getHead().getChildren().get(0)));
-            }
 
             if (tokenTree != null) {
                 nfas.put(classId, parseRexp(tokenTree.getHead().getChildren().get(0)));

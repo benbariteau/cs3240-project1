@@ -15,12 +15,16 @@ public class Production {
 	
 	List<Symbol> symbols;
 
+    public Production() {
+        symbols = new ArrayList<Symbol>();
+    }
+
 	public Production(List<Symbol> symbols) {
 		this.symbols = symbols;
 	}
 
 	public Production(Symbol... symbols) {
-		this.symbols = Arrays.asList(symbols);
+		this.symbols = new ArrayList<Symbol>(Arrays.asList(symbols));
 	}
 
 	public Production(String string) {
@@ -71,5 +75,9 @@ public class Production {
 		}
 		return nodes;
 	}
-	
+
+    public void add(Symbol s) {
+        symbols.add(s);
+    }
+
 }

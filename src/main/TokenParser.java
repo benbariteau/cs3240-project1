@@ -46,7 +46,7 @@ public class TokenParser {
 		// Parse for character tokens
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
-			if (line.startsWith("%%")){
+			if (line.startsWith("%%") || line.trim().isEmpty()){
 				continue;
 			}
 			Matcher matcher = p.matcher(line);
