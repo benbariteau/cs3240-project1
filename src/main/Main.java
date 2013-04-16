@@ -35,7 +35,6 @@ public class Main {
     Map<String, NFA> nfas = new HashMap<String, NFA>();
     NFA bigNFA;
     DFA dfa;
-    Map<String, ParseTree> classesParseTrees =  new HashMap<String, ParseTree>();
     Map<String, ParseTree> tokensParseTrees = new HashMap<String, ParseTree>();
 
     public static void main(String[] args) throws IOException {
@@ -59,22 +58,12 @@ public class Main {
         pathToTokenSpec = args[1];
 		pathToInput = args[2];
 
-		// Input and scan the grammar file
-		Map<String, String>[] mapList = new Map[2];
-		// Parse the classes and then the tokens
-		InitParser initParse = new InitParser();
-		mapList = initParse.parse(pathToTokenSpec);
-
-        Map<String, String> characterClasses = mapList[0];
-        Map<String, String> tokens = mapList[1];
+		// Input and scan the token file
+		TokenParser initParse = new TokenParser();
+		Map<String, String> tokens = initParse.parse(pathToTokenSpec);
 
         Grammar regexRules = createRegexRules();
         ParseTable parseTable = regexRules.createParseTable();
-
-        for(String key : characterClasses.keySet()) {
-            ParseTree parseTree = parseTable.parse(characterClasses.get(key), regexRules.getStartRule());
-            classesParseTrees.put(key, parseTree);
-        }
 
         for(String key : tokens.keySet()) {
             ParseTree parseTree = parseTable.parse(tokens.get(key), regexRules.getStartRule());
@@ -82,57 +71,14 @@ public class Main {
         }
 
         //Create basic NFAs for each class and token
-        createNFAs(classesParseTrees);
         createNFAs(tokensParseTrees);
-        
-        //Combine all NFAs and apply the star function to create 
-        combineNFAs();
-        
-        dfa = DFA.createFromNFA(bigNFA);
-
-        Map<NFA, String> tokenNFAs = new HashMap<NFA, String>();
-        for (String token : tokensParseTrees.keySet()) {
-            tokenNFAs.put(nfas.get(token), token.substring(1));
-        }
-        LabelledDFA ldfa = LabelledDFA.createFromNFAs(tokenNFAs);
-        ldfa.createCSV("dfa.csv");
 
         File inputFile = new File(pathToInput);
 
         Reader r = new InputStreamReader(new FileInputStream(inputFile), Charset.defaultCharset());
 
-        return parseInput(ldfa, r);
-
-		// TODO - Create DFA that recognizes tokens
-        
-        // TODO - Split input on spaces (?)
-        
-        // TODO - Run DFA on input tokens
-        
-        // TODO - Output the token-input string pairs
+        return "";
 	}
-
-    private String parseInput(LabelledDFA ldfa, Reader r) throws IOException {
-        String out = "";
-        String buffer = "";
-        int val = r.read();
-        while (val != -1) {
-            char c = (char) val;
-            Set<Integer> statuses = ldfa.next(c);
-
-            if (statuses.contains(LabelledDFA.TOKEN_END)) {
-                out += ldfa.getLastToken() + " " + buffer + System.getProperty("line.separator");
-                buffer = "";
-            }
-
-            if (statuses.contains(LabelledDFA.REGALAR)) {
-                buffer += c;
-            }
-
-            val = r.read();
-        }
-        return out;
-    }
 
     private void combineNFAs()
 	{

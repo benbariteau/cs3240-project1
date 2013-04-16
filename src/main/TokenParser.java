@@ -11,52 +11,14 @@ import java.util.regex.Pattern;
 /**
  * A class that initializes the file parser
  */
-public class InitParser {
+public class TokenParser {
 
-	public InitParser() {
-	}
-
-	private Map<String, String> mapClasses, mapTokens;
-	private String output;
-
-	Map<String, String>[] parse(String pathToGrammar) {
+	Map<String, String> parse(String pathToGrammar) {
 		// Input and scan the grammar file
 		Scanner scannerGrammar = scan(pathToGrammar);
 
-		// Check for comments at the beginning of the file.
-		if(scannerGrammar.hasNext()){
-			int counter = 0;
-			while(scannerGrammar.nextLine().startsWith("%%")){
-				counter = counter + 1;
-			}
-			if(counter == 0){
-				scannerGrammar = scan(pathToGrammar);
-			}
-			else{
-				int doubleCount = 0;
-				scannerGrammar = scan(pathToGrammar);
-				while(doubleCount < counter){
-					doubleCount = doubleCount + 1;
-					scannerGrammar.nextLine();
-				}
-			}
-		}
 		// Parse the classes and then the tokens
-		mapClasses = parseClasses(scannerGrammar);
-		mapTokens = parseTokens(scannerGrammar);
-
-		Map<String, String>[] mapList = new Map[2];
-		mapList[0] = mapClasses;
-		mapList[1] = mapTokens;
-
-		return mapList;
-	}
-
-	/*
-	 * Return the output
-	 */
-	public String getOutput() {
-		return output;
+		return parseTokens(scannerGrammar);
 	}
 
 
@@ -95,35 +57,6 @@ public class InitParser {
 			tokenMap.put(token, rest);
 		}
 		return tokenMap;
-	}
-
-	/*
-	 * Iterates over the lines of the grammar file for classes (before the line
-	 * break)
-	 */
-	private HashMap<String, String> parseClasses(Scanner scanner) {
-		// HashMap of classes and their class type
-		HashMap<String, String> classMap = new HashMap<String, String>();
-		Pattern p = Pattern.compile("\\$[A-Z-]+");
-		// Parse for character classes in grammar file
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			if (line.trim().equals("")) {
-				// A blank line means switch to the token parsing
-				break;
-			}
-			else if(line.startsWith("%%")){
-				// A comment means switch to the token parsing
-				break;
-			}
-			Matcher matcher = p.matcher(line);
-			matcher.find();
-			String charClass = matcher.group(0);
-			String rest = removeInitialWhitespace(line.substring(matcher.end()));
-			rest = removeUnescapedSpaces(rest);
-			classMap.put(charClass, rest);
-		}
-		return classMap;
 	}
 
 	/**
