@@ -72,7 +72,7 @@ public class GrammarParser {
                     production = new Production();
                     break;
                 case ' ':
-                    if ( (i+1 < productionListChars.length && productionListChars[i+1] == '|') || productionListChars[i-1] == '|') break;
+                    break;
                 default:
                     production.add(new Terminal(productionListChars[i]));
                     break;
