@@ -61,12 +61,26 @@ public class ParseTable {
 			} else if (topSymbol instanceof DfaRule) {
                 String token = ((DfaRule)topSymbol).run(inputSymbols);
                 top.addChildren(new ParseNode(new StringSymbol(token)));
+                parseStack.pop();
             } else {
 				if (first.equals(topSymbol)) {
 					parseStack.pop();
 					inputSymbols.remove(0);
-				}
+				} else if (topSymbol instanceof Terminal && ((Terminal) topSymbol).isWhitespace()) {
+                    parseStack.pop();
+                } else if (first instanceof Terminal && ((Terminal) first).isWhitespace()) {
+                    inputSymbols.remove(0);
+                }
 			}
+            String st = "Input: ";
+            for (Symbol s : inputSymbols) {
+                st += s.toString();
+            }
+            st += "\tStack: ";
+            for (ParseNode s : parseStack) {
+                st += s.getSymbol().toString();
+            }
+            System.out.println(st);
 		}
 		return tree;
 	}

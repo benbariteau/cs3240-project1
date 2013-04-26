@@ -16,19 +16,25 @@ public class DfaRule implements Symbol {
 
     @Override
     public Set<Symbol> getFirstSet() {
-        return null;
+        return dfa.getFirstSet();
     }
 
     public String run(List<Symbol> inputSymbols) throws Exception {
         String token = "";
         dfa.start();
-        Terminal symbol = (Terminal) inputSymbols.get(0);
-        while (!symbol.equals(" ")) {
-            char c = symbol.getCharacter();
-            dfa.next(c);
+
+        while (((Terminal)inputSymbols.get(0)).isWhitespace()) {
+            inputSymbols.remove(0);
+        }
+
+        boolean done = false;
+        Symbol symbol = inputSymbols.get(0);
+        while (!done && !(symbol instanceof EndOfInput)) {
+            char c = ((Terminal)symbol).getCharacter();
+            done = dfa.next(c);
             token += c;
             inputSymbols.remove(0);
-            symbol = (Terminal) inputSymbols.get(0);
+            symbol = inputSymbols.get(0);
         }
         boolean accept = dfa.isAccept();
         if (!accept) {

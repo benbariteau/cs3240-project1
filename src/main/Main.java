@@ -78,10 +78,20 @@ public class Main {
 
         Grammar grammar = new GrammarParser().parse(new Scanner(new File(pathToGrammar)), dfaRules);
         System.out.println(grammar);
+        ParseTable grammarParseTable = grammar.createParseTable();
 
         File inputFile = new File(pathToInput);
 
-        Reader r = new InputStreamReader(new FileInputStream(inputFile), Charset.defaultCharset());
+        Scanner f = new Scanner(inputFile);
+        String input = "";
+        while (f.hasNextLine()) {
+            input += f.nextLine();
+        }
+
+        ParseTree program = grammarParseTable.parse(input, grammar.getStartRule());
+        System.out.println(program);
+
+        f.close();
 
         return "";
 	}

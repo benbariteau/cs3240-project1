@@ -82,14 +82,14 @@ public class Grammar {
             for (Production p : rule.getProductions()) {
                 Set<Symbol> productionFirst = p.getFirstSet(rule);
                 for(Symbol s : productionFirst) {
-                    if (s instanceof Terminal) {
-                        productionMap.put(s, p);
-                    } else if (s instanceof EmptyString) {
+                    if (s instanceof EmptyString) {
                         for(Symbol sym : followSet) {
                             if (productionMap.get(sym) == null) {
                                 productionMap.put(sym, p);
                             }
                         }
+                    } else {
+                        productionMap.put(s, p);
                     }
                 }
             }

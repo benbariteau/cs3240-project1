@@ -41,7 +41,6 @@ public class GrammarParser {
         m.find();
         String ruleName = m.group(0);
         Rule r = getOrCreateRule(ruleName);
-        System.out.println(r.getName());
 
         String rest = s.substring(m.end());
         rest = removeGrammarAssignment(rest);
@@ -78,8 +77,6 @@ public class GrammarParser {
                     productions.add(production);
                     production = new Production();
                     break;
-                case ' ':
-                    break;
                 case 'A':
                 case 'I':
                 case 'R':
@@ -90,6 +87,10 @@ public class GrammarParser {
                     DfaRule r = dfaRules.get(ruleName);
                     production.add(r);
                     break;
+                case ' ':
+                    if (i > 0 && productionListChars[i-1] == '|') {
+                        break;
+                    }
                 default:
                     production.add(new Terminal(productionListChars[i]));
                     break;
