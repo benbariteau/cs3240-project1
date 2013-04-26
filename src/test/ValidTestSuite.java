@@ -34,14 +34,7 @@ public class ValidTestSuite extends TestSuite {
 	@Parameters
 	public static Collection<Object[]> data() {
 		Object[][] data = new Object[][] { 
-				{ "resources/valid/set0/SampleGrammar", "resources/valid/set0/SampleInput", "resources/valid/set0/SampleOutput" },
-				{ "resources/valid/set1/SampleGrammar", "resources/valid/set1/SampleInput", "resources/valid/set1/SampleOutput" },
-				{ "resources/valid/set2/SampleGrammar", "resources/valid/set2/SampleInput", "resources/valid/set2/SampleOutput" },
-				{ "resources/valid/set3/SampleGrammar", "resources/valid/set3/SampleInput", "resources/valid/set3/SampleOutput" },
-				{ "resources/valid/set4/SampleGrammar", "resources/valid/set4/SampleInput", "resources/valid/set4/SampleOutput" },
-				{ "resources/valid/set5/SampleGrammar", "resources/valid/set5/SampleInput", "resources/valid/set5/SampleOutput" },
-				{ "resources/valid/set6/SampleGrammar", "resources/valid/set6/SampleInput", "resources/valid/set6/SampleOutput" },
-				{ "resources/valid/set7/SampleGrammar", "resources/valid/set7/SampleInput", "resources/valid/set7/SampleOutput" }
+				{ "resources/testcase1/grammar.txt", "resources/testcase1/input1.txt", "resources/testcase1/output1.txt", "resources/testcase1/script.txt", "resources/testcase1/spec.txt"}
 		};
 		return Arrays.asList(data);
 	}
@@ -49,8 +42,8 @@ public class ValidTestSuite extends TestSuite {
 	/*
 	 * Constructor for the run of tests
 	 */
-	public ValidTestSuite(String pathGrammar, String pathInput, String pathOutput) {
-		super(pathGrammar, pathInput, pathOutput);
+	public ValidTestSuite(String pathGrammar, String pathInput, String pathOutput, String pathScript, String pathSpec) {
+		super(pathGrammar, pathInput, pathOutput, pathScript, pathSpec);
 	 }
 
 	/*
@@ -63,7 +56,7 @@ public class ValidTestSuite extends TestSuite {
 	 */
 	@Test
 	public void test_all() throws IOException {
-		String s = new Main().run(new String[] { this.pathGrammar, this.pathInput });
+		String s = new Main().run(new String[] { this.pathGrammar, this.pathSpec, this.pathInput });
         System.out.println(s);
         assertTrue(s.equals(textOutput));
 	}
