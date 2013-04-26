@@ -63,10 +63,6 @@ public class Main {
 		TokenParser initParse = new TokenParser();
 		Map<String, String> tokens = initParse.parse(pathToTokenSpec);
 
-        for (String key : tokens.keySet()) {
-            System.out.println(key + " " + tokens.get(key));
-        }
-
         Grammar regexRules = createRegexRules();
         ParseTable parseTable = regexRules.createParseTable();
 
@@ -75,22 +71,10 @@ public class Main {
             tokensParseTrees.put(key, parseTree);
         }
 
-        for (String key : tokensParseTrees.keySet()) {
-            System.out.println(key + " " + tokensParseTrees.get(key));
-        }
-
         //Create basic NFAs for each class and token
         createNFAs(tokensParseTrees);
 
-        for (String key : nfas.keySet()) {
-            System.out.println(key + "\n" + nfas.get(key));
-        }
-
         Map<String, DfaRule> dfaRules = createDfaRules(nfas);
-
-        for (String key : dfaRules.keySet()) {
-            System.out.println(key + " " + dfaRules.get(key));
-        }
 
         Grammar grammar = new GrammarParser().parse(new Scanner(new File(pathToGrammar)), dfaRules);
         System.out.println(grammar);
