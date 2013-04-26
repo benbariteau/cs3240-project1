@@ -42,7 +42,7 @@ public class TokenParser {
 	private HashMap<String, String> parseTokens(Scanner scanner) {
 		// HashMap of tokens and their token type
 		HashMap<String, String> tokenMap = new HashMap<String, String>();
-		Pattern p = Pattern.compile("\\$[A-Z-]+");
+		Pattern p = Pattern.compile("\\$([A-Z]+(-|_)?[A-Z]+)|[A-Z]+");
 		// Parse for character tokens
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();

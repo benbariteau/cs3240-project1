@@ -62,7 +62,7 @@ public class ValidTestSuite extends TestSuite {
 	 * A single correct run
 	 */
 	@Test
-	public void test_all() throws IOException {
+	public void test_all() throws Exception {
 		String s = new Main().run(new String[] { this.pathGrammar, this.pathInput });
         System.out.println(s);
         assertTrue(s.equals(textOutput));

@@ -1,5 +1,7 @@
 package main;
 
+import main.grammar.Terminal;
+
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -224,5 +226,20 @@ public class DFA {
 
     public HashMap<Set<State>, State> getDfaMap() {
         return dfaMap;
+    }
+
+    public void start() {
+        currentState = startState;
+    }
+
+    public void next(char c) {
+        if (currentState == null) {
+            start();
+        }
+        currentState = table.get(currentState).get(c);
+    }
+
+    public boolean isAccept() {
+        return acceptStates.contains(currentState);
     }
 }

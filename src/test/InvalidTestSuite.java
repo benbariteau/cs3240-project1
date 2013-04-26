@@ -135,7 +135,7 @@ public class InvalidTestSuite {
 	 * A single correct run
 	 */
 	@Test
-	public void test_all() throws IOException {
+	public void test_all() throws Exception {
 		String s = new Main().run(new String[] { pathGrammar, pathInput });
         System.out.println(s);
         assertFalse(s.equals(textOutput));

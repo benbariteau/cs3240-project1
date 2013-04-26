@@ -1,9 +1,11 @@
 package main.parse;
 
+import main.grammar.DfaRule;
 import main.grammar.EmptyString;
 import main.grammar.EndOfInput;
 import main.grammar.Production;
 import main.grammar.Rule;
+import main.grammar.StringSymbol;
 import main.grammar.Symbol;
 import main.grammar.Terminal;
 
@@ -29,7 +31,7 @@ public class ParseTable {
 	/**
 	 * Parse the input string
 	 */
-	public ParseTree parse(String input, Rule startVariable) {
+	public ParseTree parse(String input, Rule startVariable) throws Exception {
 		ParseTree tree = new ParseTree(startVariable);
 
 		List<Symbol> inputSymbols = stringToSymbolList(input);
@@ -56,7 +58,10 @@ public class ParseTable {
 						parseStack.push(parseNode);
 					}
 				}
-			} else {
+			} else if (topSymbol instanceof DfaRule) {
+                String token = ((DfaRule)topSymbol).run(inputSymbols);
+                top.addChildren(new ParseNode(new StringSymbol(token)));
+            } else {
 				if (first.equals(topSymbol)) {
 					parseStack.pop();
 					inputSymbols.remove(0);

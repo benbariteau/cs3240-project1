@@ -1,5 +1,6 @@
 package main;
 
+import main.grammar.DfaRule;
 import main.grammar.EmptyString;
 import main.grammar.Grammar;
 import main.grammar.Production;
@@ -11,7 +12,6 @@ import main.parse.ParseTree;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
@@ -38,7 +38,7 @@ public class Main {
     DFA dfa;
     Map<String, ParseTree> tokensParseTrees = new HashMap<String, ParseTree>();
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         System.out.println(new Main().run(args));
     }
 
@@ -49,7 +49,7 @@ public class Main {
 	 * 
 	 * @arg[1] Input
 	 */
-	public String run(String[] args) throws IOException {
+	public String run(String[] args) throws Exception {
 
 		// Ensure proper input parameters
 		inputValidation(args);
@@ -59,12 +59,13 @@ public class Main {
         pathToTokenSpec = args[1];
 		pathToInput = args[2];
 
-        Grammar grammar = new GrammarParser().parse(new Scanner(new File(pathToGrammar)));
-        System.out.println(grammar);
-
 		// Input and scan the token file
 		TokenParser initParse = new TokenParser();
 		Map<String, String> tokens = initParse.parse(pathToTokenSpec);
+
+        for (String key : tokens.keySet()) {
+            System.out.println(key + " " + tokens.get(key));
+        }
 
         Grammar regexRules = createRegexRules();
         ParseTable parseTable = regexRules.createParseTable();
@@ -74,8 +75,25 @@ public class Main {
             tokensParseTrees.put(key, parseTree);
         }
 
+        for (String key : tokensParseTrees.keySet()) {
+            System.out.println(key + " " + tokensParseTrees.get(key));
+        }
+
         //Create basic NFAs for each class and token
         createNFAs(tokensParseTrees);
+
+        for (String key : nfas.keySet()) {
+            System.out.println(key + "\n" + nfas.get(key));
+        }
+
+        Map<String, DfaRule> dfaRules = createDfaRules(nfas);
+
+        for (String key : dfaRules.keySet()) {
+            System.out.println(key + " " + dfaRules.get(key));
+        }
+
+        Grammar grammar = new GrammarParser().parse(new Scanner(new File(pathToGrammar)), dfaRules);
+        System.out.println(grammar);
 
         File inputFile = new File(pathToInput);
 
@@ -84,10 +102,15 @@ public class Main {
         return "";
 	}
 
-    private void combineNFAs()
-	{
-		bigNFA = NFA.unionNFAs(nfas.values());
-	}
+    private Map<String, DfaRule> createDfaRules(Map<String, NFA> nfas) {
+        Map<String, DfaRule> dfaRules = new HashMap<String, DfaRule>();
+        for (String key : nfas.keySet()) {
+            System.out.println("Creating DFA rule for " + key);
+            NFA nfa = nfas.get(key);
+            dfaRules.put(key, new DfaRule(key, DFA.createFromNFA(nfa)));
+        }
+        return dfaRules;
+    }
 
     private void createNFAs(Map<String, ParseTree> parseTrees) {
         for (String key : parseTrees.keySet()) {
@@ -96,9 +119,6 @@ public class Main {
                 NFA nfa = createNFA(parseTree);
                 nfas.put(key, nfa);
             }
-//            System.out.println(key + " " + parseTree.getInputString());
-//            System.out.println(nfas.get(key));
-//            System.out.println(DFA.createFromNFA(nfas.get(key)) + "\n");
         }
     }
 

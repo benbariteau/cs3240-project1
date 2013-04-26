@@ -103,5 +103,5 @@ public abstract class TestSuite {
 	 * A single correct run
 	 */
 	@Test
-	public abstract void test_all() throws IOException;
+	public abstract void test_all() throws Exception;
 }
