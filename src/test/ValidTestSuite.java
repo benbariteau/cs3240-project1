@@ -21,13 +21,22 @@ public class ValidTestSuite extends TestSuite {
 
 	/*
 	 * The list of valid test cases to use for the tests:
-	 * testcase1 - The testcase given by the TA's
+	 * testcase1 - The original testcase given by the TA's
+	 * testcase2 - A modified version of the original testcase
+	 * testcase3 - A modified version of the original testcase
+	 * testcase4 - A modified version of the original testcase
+	 * testcase5 - A modified version of the original testcase
+	 * 
 	 * 
 	 */
 	@Parameters
 	public static Collection<Object[]> data() {
 		Object[][] data = new Object[][] { 
-				{ "resources/testcase1/grammar.txt", "resources/testcase1/input1.txt", "resources/testcase1/output1.txt", "resources/testcase1/script.txt", "resources/testcase1/spec.txt"}
+				{ "resources/testcase1/grammar.txt", "resources/testcase1/input1.txt", "resources/testcase1/output1.txt", "resources/testcase1/script.txt", "resources/testcase1/spec.txt"},
+				{ "resources/testcase2/grammar.txt", "resources/testcase2/input1.txt", "resources/testcase2/output1.txt", "resources/testcase2/script.txt", "resources/testcase2/spec.txt"},
+				{ "resources/testcase3/grammar.txt", "resources/testcase3/input1.txt", "resources/testcase3/output1.txt", "resources/testcase3/script.txt", "resources/testcase3/spec.txt"},
+				{ "resources/testcase4/grammar.txt", "resources/testcase4/input1.txt", "resources/testcase4/output1.txt", "resources/testcase4/script.txt", "resources/testcase4/spec.txt"},
+				{ "resources/testcase5/grammar.txt", "resources/testcase5/input1.txt", "resources/testcase5/output1.txt", "resources/testcase5/script.txt", "resources/testcase5/spec.txt"}
 		};
 		return Arrays.asList(data);
 	}
