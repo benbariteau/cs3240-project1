@@ -59,7 +59,7 @@ public class ValidTestSuite extends TestSuite {
 	@Test
 	public void test_all() throws IOException {
 		String s = new Main().run(new String[] { this.pathGrammar, this.pathSpec, this.pathInput });
-        System.out.println(s);
+        System.out.println("Actual Output:\n" + s);
         assertTrue(s.equals(textOutput));
 	}
 
