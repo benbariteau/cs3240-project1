@@ -22,10 +22,10 @@ public class ValidTestSuite extends TestSuite {
 	/*
 	 * The list of valid test cases to use for the tests:
 	 * testcase1 - The original testcase given by the TA's
-	 * testcase2 - A modified version of the original testcase
-	 * testcase3 - A modified version of the original testcase
-	 * testcase4 - A modified version of the original testcase
-	 * testcase5 - A modified version of the original testcase
+	 * testcase2 - A modified version of the original testcase - shorter length
+	 * testcase3 - A modified version of the original testcase - longer length
+	 * testcase4 - A modified version of the original testcase - whitespace heavy case
+	 * testcase5 - A modified version of the original testcase - empty/null case
 	 * 
 	 * 
 	 */
