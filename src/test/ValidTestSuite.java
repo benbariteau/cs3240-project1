@@ -21,14 +21,7 @@ public class ValidTestSuite extends TestSuite {
 
 	/*
 	 * The list of valid test cases to use for the tests:
-	 * set0 - Simple grammar and a simple input
-	 * set1 - Simple grammar but a complex input
-	 * set2 - Complex grammar but a simple input
-	 * set3 - Complex grammar and a complex input (T-Square sample)
-	 * set4 - Grammar with a lot of comments
-	 * set5 - Grammar with a comment line instead of a blank line separator
-	 * set6 - No unnecessary whitespace characters
-	 * set7 - A lot of unnecessary whitespace
+	 * testcase1 - The testcase given by the TA's
 	 * 
 	 */
 	@Parameters
@@ -52,7 +45,7 @@ public class ValidTestSuite extends TestSuite {
 	 */
 
 	/*
-	 * A single correct run
+	 * Checks whether output is the same as expected output
 	 */
 	@Test
 	public void test_all() throws IOException {
