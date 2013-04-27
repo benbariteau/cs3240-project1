@@ -247,7 +247,9 @@ public class DFA {
         Set<Character> charSet = table.get(startState).keySet();
         Set<Symbol> firstSet = new HashSet<Symbol>();
         for (char c : charSet) {
-            firstSet.add(new Terminal(c));
+            if (table.get(startState).get(c) != null) {
+                firstSet.add(new Terminal(c));
+            }
         }
         return firstSet;
     }

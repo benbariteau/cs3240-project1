@@ -43,9 +43,10 @@ public class Production {
 				return firstSet;
 			}
 			Set<Symbol> elementFirst = symbols.get(i).getFirstSet();
+            boolean isSpace = symbols.get(i).equals(' ');
 			boolean containedEmptyString = elementFirst.remove(new EmptyString());
 			firstSet.addAll(elementFirst);
-			if (!containedEmptyString)
+			if (!containedEmptyString && !isSpace)
 				break;
 		}
 
