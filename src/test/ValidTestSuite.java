@@ -57,7 +57,7 @@ public class ValidTestSuite extends TestSuite {
 	 * Checks whether output is the same as expected output
 	 */
 	@Test
-	public void test_all() throws IOException {
+	public void test_all() throws Exception {
 		String s = new Main().run(new String[] { this.pathGrammar, this.pathSpec, this.pathInput });
         System.out.println("Actual Output:\n" + s);
         assertTrue(s.equals(textOutput));
