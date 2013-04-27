@@ -15,12 +15,16 @@ public class Production {
 	
 	List<Symbol> symbols;
 
+    public Production() {
+        symbols = new ArrayList<Symbol>();
+    }
+
 	public Production(List<Symbol> symbols) {
 		this.symbols = symbols;
 	}
 
 	public Production(Symbol... symbols) {
-		this.symbols = Arrays.asList(symbols);
+		this.symbols = new ArrayList<Symbol>(Arrays.asList(symbols));
 	}
 
 	public Production(String string) {
@@ -39,9 +43,10 @@ public class Production {
 				return firstSet;
 			}
 			Set<Symbol> elementFirst = symbols.get(i).getFirstSet();
+            boolean isSpace = symbols.get(i).equals(' ');
 			boolean containedEmptyString = elementFirst.remove(new EmptyString());
 			firstSet.addAll(elementFirst);
-			if (!containedEmptyString)
+			if (!containedEmptyString && !isSpace)
 				break;
 		}
 
@@ -71,5 +76,9 @@ public class Production {
 		}
 		return nodes;
 	}
-	
+
+    public void add(Symbol s) {
+        symbols.add(s);
+    }
+
 }

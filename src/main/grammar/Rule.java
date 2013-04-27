@@ -60,8 +60,17 @@ public class Rule implements Symbol {
 
 	@Override
 	public String toString() {
-		return "<" + ruleName + ">";
+        return ruleName;
 	}
+
+    public String toLongString() {
+        String s = ruleName + " -> ";
+        for (int i = 0; i < productions.size(); i++) {
+            Production p = productions.get(i);
+            s += p.toString() + (i != productions.size() - 1 ? " | " : "");
+        }
+        return s;
+    }
 
 	public void addProductions(Collection<Production> charList) {
 		productions.addAll(charList);
