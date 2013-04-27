@@ -46,15 +46,15 @@ public class Main {
 	 * Main method and driver of the program
 	 * 
 	 * @arg[0] Grammar
-	 * 
-	 * @arg[1] Input
+	 * @arg[1] Token Spec
+	 * @arg[2] Input
 	 */
 	public String run(String[] args) throws Exception {
 
 		// Ensure proper input parameters
 		inputValidation(args);
 
-		// The two file paths (grammar and input file respectively)
+		// The three file paths (grammar, token spec, input file respectively)
 		pathToGrammar = args[0];
         pathToTokenSpec = args[1];
 		pathToInput = args[2];

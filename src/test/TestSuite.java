@@ -14,14 +14,12 @@ import org.junit.Test;
 public abstract class TestSuite {
 
 	// Localized file paths
-	protected String pathGrammar = "";
+	protected String pathGrammar = "", pathInput = "", pathSpec = "";
 
-	protected String pathInput = "";
-
-	private String pathOutput = "";
+	private String pathOutput = "", pathScript = "";
 
 	// The actual files
-	private File fileGrammar, fileInput, fileOutput;
+	private File fileGrammar, fileInput, fileOutput, fileScript, fileSpec;
 
 	// The texts contained within the files
 	protected String textOutput = "";
@@ -29,10 +27,12 @@ public abstract class TestSuite {
 	/*
 	 * Constructor for the run of tests
 	 */
-	public TestSuite(String pathGrammar, String pathInput, String pathOutput) {
+	public TestSuite(String pathGrammar, String pathInput, String pathOutput, String pathScript, String pathSpec) {
 		this.pathGrammar = pathGrammar;
 		this.pathInput = pathInput;
 		this.pathOutput = pathOutput;
+		this.pathScript = pathScript;
+		this.pathSpec = pathSpec;
 	 }
 
 	/*
@@ -54,6 +54,8 @@ public abstract class TestSuite {
 		fileGrammar = new File(pathGrammar);
 		fileInput = new File(pathInput);
 		fileOutput = new File(pathOutput);
+		fileScript = new File(pathScript);
+		fileSpec= new File(pathSpec);
 	}
 
 	/*
@@ -62,7 +64,9 @@ public abstract class TestSuite {
 	private void display() {
 		System.out.println(fileGrammar.getAbsolutePath());
 		System.out.println(fileInput.getAbsolutePath());
-		System.out.println(fileOutput.getAbsolutePath() + "\n");
+		System.out.println(fileOutput.getAbsolutePath());
+		System.out.println(fileScript.getAbsolutePath());
+		System.out.println(fileSpec.getAbsolutePath() + "\n");
 		textOutput = displayFile(fileOutput);
 	}
 
