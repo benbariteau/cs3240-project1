@@ -2,6 +2,7 @@ package main.grammar;
 
 import main.parse.ParseTable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,11 @@ import java.util.Set;
 public class Grammar {
     Rule startRule;
     List<Rule> rules;
+
+    public Grammar() {
+        startRule = null;
+        rules = new ArrayList<Rule>();
+    }
 
     /**
      * Constructor for the grammar
@@ -76,14 +82,14 @@ public class Grammar {
             for (Production p : rule.getProductions()) {
                 Set<Symbol> productionFirst = p.getFirstSet(rule);
                 for(Symbol s : productionFirst) {
-                    if (s instanceof Terminal) {
-                        productionMap.put(s, p);
-                    } else if (s instanceof EmptyString) {
+                    if (s instanceof EmptyString) {
                         for(Symbol sym : followSet) {
                             if (productionMap.get(sym) == null) {
                                 productionMap.put(sym, p);
                             }
                         }
+                    } else {
+                        productionMap.put(s, p);
                     }
                 }
             }
@@ -92,5 +98,26 @@ public class Grammar {
 
         return new ParseTable(table);
     }
-    
+
+    public List<Rule> getRules() {
+        return rules;
+    }
+
+    public void addRule(Rule r) {
+        if (rules.size() == 0) {
+            startRule = r;
+        }
+
+        if (!rules.contains(r)) {
+            rules.add(r);
+        }
+    }
+
+    public String toString() {
+        String s = "";
+        for (Rule r : rules) {
+            s += (r == startRule ? ">" : "") + r.toLongString() + "\n";
+        }
+        return s;
+    }
 }
