@@ -21,27 +21,22 @@ public class ValidTestSuite extends TestSuite {
 
 	/*
 	 * The list of valid test cases to use for the tests:
-	 * set0 - Simple grammar and a simple input
-	 * set1 - Simple grammar but a complex input
-	 * set2 - Complex grammar but a simple input
-	 * set3 - Complex grammar and a complex input (T-Square sample)
-	 * set4 - Grammar with a lot of comments
-	 * set5 - Grammar with a comment line instead of a blank line separator
-	 * set6 - No unnecessary whitespace characters
-	 * set7 - A lot of unnecessary whitespace
+	 * testcase1 - The original testcase given by the TA's
+	 * testcase2 - A modified version of the original testcase - shorter length
+	 * testcase3 - A modified version of the original testcase - longer length
+	 * testcase4 - A modified version of the original testcase - whitespace heavy case
+	 * testcase5 - A modified version of the original testcase - empty/null case
+	 * 
 	 * 
 	 */
 	@Parameters
 	public static Collection<Object[]> data() {
 		Object[][] data = new Object[][] { 
-				{ "resources/valid/set0/SampleGrammar", "resources/valid/set0/SampleInput", "resources/valid/set0/SampleOutput" },
-				{ "resources/valid/set1/SampleGrammar", "resources/valid/set1/SampleInput", "resources/valid/set1/SampleOutput" },
-				{ "resources/valid/set2/SampleGrammar", "resources/valid/set2/SampleInput", "resources/valid/set2/SampleOutput" },
-				{ "resources/valid/set3/SampleGrammar", "resources/valid/set3/SampleInput", "resources/valid/set3/SampleOutput" },
-				{ "resources/valid/set4/SampleGrammar", "resources/valid/set4/SampleInput", "resources/valid/set4/SampleOutput" },
-				{ "resources/valid/set5/SampleGrammar", "resources/valid/set5/SampleInput", "resources/valid/set5/SampleOutput" },
-				{ "resources/valid/set6/SampleGrammar", "resources/valid/set6/SampleInput", "resources/valid/set6/SampleOutput" },
-				{ "resources/valid/set7/SampleGrammar", "resources/valid/set7/SampleInput", "resources/valid/set7/SampleOutput" }
+				{ "resources/testcase1/grammar.txt", "resources/testcase1/input.txt", "resources/testcase1/output.txt", "resources/testcase1/script.txt", "resources/testcase1/spec.txt"},
+				{ "resources/testcase2/grammar.txt", "resources/testcase2/input.txt", "resources/testcase2/output.txt", "resources/testcase2/script.txt", "resources/testcase2/spec.txt"},
+				{ "resources/testcase3/grammar.txt", "resources/testcase3/input.txt", "resources/testcase3/output.txt", "resources/testcase3/script.txt", "resources/testcase3/spec.txt"},
+				{ "resources/testcase4/grammar.txt", "resources/testcase4/input.txt", "resources/testcase4/output.txt", "resources/testcase4/script.txt", "resources/testcase4/spec.txt"},
+				{ "resources/testcase5/grammar.txt", "resources/testcase5/input.txt", "resources/testcase5/output.txt", "resources/testcase5/script.txt", "resources/testcase5/spec.txt"}
 		};
 		return Arrays.asList(data);
 	}
@@ -49,8 +44,8 @@ public class ValidTestSuite extends TestSuite {
 	/*
 	 * Constructor for the run of tests
 	 */
-	public ValidTestSuite(String pathGrammar, String pathInput, String pathOutput) {
-		super(pathGrammar, pathInput, pathOutput);
+	public ValidTestSuite(String pathGrammar, String pathInput, String pathOutput, String pathScript, String pathSpec) {
+		super(pathGrammar, pathInput, pathOutput, pathScript, pathSpec);
 	 }
 
 	/*
@@ -59,12 +54,12 @@ public class ValidTestSuite extends TestSuite {
 	 */
 
 	/*
-	 * A single correct run
+	 * Checks whether output is the same as expected output
 	 */
 	@Test
-	public void test_all() throws IOException {
-		String s = new Main().run(new String[] { this.pathGrammar, this.pathInput });
-        System.out.println(s);
+	public void test_all() throws Exception {
+		String s = new Main().run(new String[] { this.pathGrammar, this.pathSpec, this.pathInput });
+        System.out.println("Actual Output:\n" + s);
         assertTrue(s.equals(textOutput));
 	}
 
