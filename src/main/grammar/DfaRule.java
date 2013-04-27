@@ -32,9 +32,11 @@ public class DfaRule implements Symbol {
         while (!done && !(symbol instanceof EndOfInput)) {
             char c = ((Terminal)symbol).getCharacter();
             done = dfa.next(c);
-            token += c;
-            inputSymbols.remove(0);
-            symbol = inputSymbols.get(0);
+            if (!done) {
+                token += c;
+                inputSymbols.remove(0);
+                symbol = inputSymbols.get(0);
+            }
         }
         boolean accept = dfa.isAccept();
         if (!accept) {
