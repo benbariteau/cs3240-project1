@@ -97,7 +97,6 @@ public class Main {
             tokenNFAs.put(nfas.get(token), token.substring(1));
         }
         LabelledDFA ldfa = LabelledDFA.createFromNFAs(tokenNFAs);
-        ldfa.createCSV("dfa.csv");
 
         File inputFile = new File(pathToInput);
 
