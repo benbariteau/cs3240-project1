@@ -84,11 +84,6 @@ public class Main {
         //Create basic NFAs for each class and token
         createNFAs(classesParseTrees);
         createNFAs(tokensParseTrees);
-        
-        //Combine all NFAs and apply the star function to create 
-        combineNFAs();
-        
-        dfa = DFA.createFromNFA(bigNFA);
 
         Map<NFA, String> tokenNFAs = new HashMap<NFA, String>();
         for (String token : tokensParseTrees.keySet()) {
@@ -100,11 +95,15 @@ public class Main {
 
         Reader r = new InputStreamReader(new FileInputStream(inputFile), Charset.defaultCharset());
 
-        return parseInput(ldfa, r);
+        List<MultiToken> inputTokens = parseInput(ldfa, r);
+        for (MultiToken token : inputTokens) {
+            System.out.println(token);
+        }
+        return "";
 	}
 
-    private String parseInput(LabelledDFA ldfa, Reader r) throws IOException {
-        String out = "";
+    private List<MultiToken> parseInput(LabelledDFA ldfa, Reader r) throws IOException {
+        List<MultiToken> tokens = new ArrayList<MultiToken>();
         String buffer = "";
         int val = r.read();
         while (val != -1) {
@@ -112,7 +111,7 @@ public class Main {
             Set<Integer> statuses = ldfa.next(c);
 
             if (statuses.contains(LabelledDFA.TOKEN_END)) {
-                out += ldfa.getLastToken() + " " + buffer + System.getProperty("line.separator");
+                tokens.add(new MultiToken(ldfa.getLastToken(), buffer));
                 buffer = "";
             }
 
@@ -122,7 +121,7 @@ public class Main {
 
             val = r.read();
         }
-        return out;
+        return tokens;
     }
 
     private void combineNFAs()

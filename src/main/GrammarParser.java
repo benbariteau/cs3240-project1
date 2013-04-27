@@ -3,6 +3,7 @@ package main;
 import main.grammar.DfaRule;
 import main.grammar.EmptyString;
 import main.grammar.Grammar;
+import main.grammar.MultiToken;
 import main.grammar.Production;
 import main.grammar.Rule;
 import main.grammar.Terminal;
@@ -90,13 +91,15 @@ public class GrammarParser {
                     production.add(r);
                     break;
                 default:
+                    String st = "";
                     for (; i < productionListChars.length; i++) {
                         c = productionListChars[i];
                         Set<Integer> status = tokenRecognizer.next(c);
                         if (status.contains(LabelledDFA.TOKEN_END)) {
-                            production.add(new Token(tokenRecognizer.getLastToken()));
+                            production.add(new MultiToken(tokenRecognizer.getLastToken(), st));
                             break;
                         }
+                        st += c;
                     }
                     break;
             }

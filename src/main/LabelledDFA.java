@@ -1,16 +1,19 @@
 package main;
 
+import main.grammar.Token;
+
 import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class LabelledDFA {
     DFA dfa;
-    Map<State, String> acceptMap;
+    Map<State, Set<String>> acceptMap;
     State currentState;
-    private String lastToken;
+    private Set<String> lastToken;
 
     public static final int NON_TOKEN_WHITESPACE = 0;
     public static final int TOKEN_END = 1;
@@ -18,7 +21,7 @@ public class LabelledDFA {
 
     public LabelledDFA() {
         dfa = null;
-        acceptMap = new HashMap<State, String>();
+        acceptMap = new HashMap<State, Set<String>>();
     }
 
     public Set<Integer> next(char c) {
@@ -66,7 +69,12 @@ public class LabelledDFA {
                 }
 
                 if (isAccept) {
-                    ldfa.acceptMap.put(dfaStateMap.get(s), nfas.get(nfa));
+                    Set<String> labels = ldfa.acceptMap.get(dfaStateMap.get(s));
+                    if (labels == null) {
+                        labels = new HashSet<String>();
+                    }
+                    labels.add(nfas.get(nfa));
+                    ldfa.acceptMap.put(dfaStateMap.get(s), labels);
                 }
             }
         }
@@ -140,7 +148,7 @@ public class LabelledDFA {
         }
     }
 
-    public String getLastToken() {
+    public Set<String> getLastToken() {
         return lastToken;
     }
 }

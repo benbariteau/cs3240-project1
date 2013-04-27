@@ -80,7 +80,7 @@ public class TokenParser {
 	private HashMap<String, String> parseTokens(Scanner scanner) {
 		// HashMap of tokens and their token type
 		HashMap<String, String> tokenMap = new HashMap<String, String>();
-		Pattern p = Pattern.compile("\\$[A-Z-]+");
+        Pattern p = Pattern.compile("\\$([A-Z]+[A-Z-_]+[A-Z]+|[A-Z]+)");
 		// Parse for character tokens
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
@@ -104,7 +104,7 @@ public class TokenParser {
 	private HashMap<String, String> parseClasses(Scanner scanner) {
 		// HashMap of classes and their class type
 		HashMap<String, String> classMap = new HashMap<String, String>();
-		Pattern p = Pattern.compile("\\$[A-Z-]+");
+		Pattern p = Pattern.compile("\\$([A-Z]+|[A-Z]+[A-Z-_]+[A-Z]+)");
 		// Parse for character classes in grammar file
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
