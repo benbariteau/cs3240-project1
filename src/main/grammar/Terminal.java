@@ -1,5 +1,6 @@
 package main.grammar;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,6 +24,10 @@ public class Terminal implements Symbol {
 	}
 
 	public boolean equals(Object obj) {
+        if (obj instanceof Character) {
+            return character == ((Character) obj).charValue();
+        }
+
 		if (!(obj instanceof Terminal)) {
 			return false;
 		}
@@ -42,4 +47,9 @@ public class Terminal implements Symbol {
 		return firstSet;
 	}
 
+    private static final Set<Character> WHITESPACE = new HashSet<Character>(Arrays.asList(' ', '\n', '\t'));
+
+    public boolean isWhitespace() {
+        return WHITESPACE.contains(character);
+    }
 }

@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
 /**
  * A class that initializes the file parser
  */
-public class InitParser {
+public class TokenParser {
 
-	public InitParser() {
+	public TokenParser() {
 	}
 
 	private Map<String, String> mapClasses, mapTokens;

@@ -1,5 +1,8 @@
 package main;
 
+import main.grammar.Symbol;
+import main.grammar.Terminal;
+
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,13 +70,10 @@ public class DFA {
         dfa.dfaMap = new HashMap<Set<State>, State>();
         for (Set<State> s : dfaStates.keySet()) {
             boolean isAccept = false;
-            String name = "{";
             for (State state : s) {
                 isAccept = isAccept || nfa.acceptStates.contains(state);
-                name += state.name +",";
             }
-            name += "}";
-            State state = new State(name);
+            State state = new State();
             dfa.dfaMap.put(s, !s.isEmpty() ? state : null);
             if (isAccept) {
                 dfa.acceptStates.add(state);
@@ -224,5 +224,33 @@ public class DFA {
 
     public HashMap<Set<State>, State> getDfaMap() {
         return dfaMap;
+    }
+
+    public void start() {
+        currentState = startState;
+    }
+
+    public boolean next(char c) {
+        State newState = table.get(currentState).get(c);
+        if (newState != null) {
+            currentState = newState;
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isAccept() {
+        return acceptStates.contains(currentState);
+    }
+
+    public Set<Symbol> getFirstSet() {
+        Set<Character> charSet = table.get(startState).keySet();
+        Set<Symbol> firstSet = new HashSet<Symbol>();
+        for (char c : charSet) {
+            if (table.get(startState).get(c) != null) {
+                firstSet.add(new Terminal(c));
+            }
+        }
+        return firstSet;
     }
 }
