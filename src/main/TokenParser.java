@@ -133,7 +133,7 @@ public class TokenParser {
 	 * @return
 	 */
 	private String removeUnescapedSpaces(String line) {
-		Pattern p = Pattern.compile("(?<!\\\\|IN) (?!IN)");
+		Pattern p = Pattern.compile("(?<!\\\\|IN|\\[) (?!\\]|IN)");
 		Matcher matcher = p.matcher(line);
 		line = matcher.replaceAll("");
 		return line;
