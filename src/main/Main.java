@@ -103,14 +103,6 @@ public class Main {
         Reader r = new InputStreamReader(new FileInputStream(inputFile), Charset.defaultCharset());
 
         return parseInput(ldfa, r);
-
-		// TODO - Create DFA that recognizes tokens
-        
-        // TODO - Split input on spaces (?)
-        
-        // TODO - Run DFA on input tokens
-        
-        // TODO - Output the token-input string pairs
 	}
 
     private String parseInput(LabelledDFA ldfa, Reader r) throws IOException {
