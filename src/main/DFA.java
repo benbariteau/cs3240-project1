@@ -231,6 +231,9 @@ public class DFA {
     }
 
     public boolean next(char c) {
+        if (currentState == null) {
+            currentState = startState;
+        }
         State newState = table.get(currentState).get(c);
         if (newState != null) {
             currentState = newState;

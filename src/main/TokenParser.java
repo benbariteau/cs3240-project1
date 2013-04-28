@@ -2,7 +2,9 @@ package main;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -13,13 +15,15 @@ import java.util.regex.Pattern;
  */
 public class TokenParser {
 
-	public TokenParser() {
-	}
+    public static class TokenInfo {
+        public Map<String, String> characterClasses;
+        public Map<String, String> tokens;
+        public List<String> tokenList;
+    }
 
-	private Map<String, String> mapClasses, mapTokens;
 	private String output;
 
-	Map<String, String>[] parse(String pathToGrammar, String pathToInput) {
+	TokenInfo parse(String pathToGrammar, String pathToInput) {
 		// Input and scan the grammar file
 		Scanner scannerGrammar = scan(pathToGrammar);
 
@@ -41,15 +45,15 @@ public class TokenParser {
 				}
 			}
 		}
+
+        TokenInfo info = new TokenInfo();
+        info.tokenList = new ArrayList<String>();
+
 		// Parse the classes and then the tokens
-		mapClasses = parseClasses(scannerGrammar);
-		mapTokens = parseTokens(scannerGrammar);
+		info.characterClasses = parseClasses(scannerGrammar);
+		info.tokens = parseTokens(scannerGrammar, info);
 
-		Map<String, String>[] mapList = new Map[2];
-		mapList[0] = mapClasses;
-		mapList[1] = mapTokens;
-
-		return mapList;
+        return info;
 	}
 
 	/*
@@ -77,7 +81,7 @@ public class TokenParser {
 	/*
 	 * Iterates over the grammar file after the line break (so for tokens)
 	 */
-	private HashMap<String, String> parseTokens(Scanner scanner) {
+	private HashMap<String, String> parseTokens(Scanner scanner, TokenInfo info) {
 		// HashMap of tokens and their token type
 		HashMap<String, String> tokenMap = new HashMap<String, String>();
         Pattern p = Pattern.compile("\\$([A-Z]+[A-Z-_]+[A-Z]+|[A-Z]+)");
@@ -90,6 +94,7 @@ public class TokenParser {
 			Matcher matcher = p.matcher(line);
 			matcher.find();
 			String token = matcher.group(0);
+            info.tokenList.add(token);
 			String rest = removeInitialWhitespace(line.substring(matcher.end()));
 			rest = removeUnescapedSpaces(rest);
 			tokenMap.put(token, rest);

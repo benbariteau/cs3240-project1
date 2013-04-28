@@ -5,22 +5,21 @@ import main.grammar.Grammar;
 import main.grammar.Production;
 import main.grammar.Rule;
 import main.grammar.Terminal;
+import main.grammar.Token;
+import main.parse.NamedDFA;
 import main.parse.ParseNode;
 import main.parse.ParseTable;
 import main.parse.ParseTree;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 public class Main {
@@ -59,14 +58,12 @@ public class Main {
         pathToTokenSpec = args[1];
 		pathToInput = args[2];
 
-		// Input and scan the grammar file
-		Map<String, String>[] mapList = new Map[2];
 		// Parse the classes and then the tokens
 		TokenParser initParse = new TokenParser();
-		mapList = initParse.parse(pathToTokenSpec, pathToInput);
+		TokenParser.TokenInfo info = initParse.parse(pathToTokenSpec, pathToInput);
 
-        Map<String, String> characterClasses = mapList[0];
-        Map<String, String> tokens = mapList[1];
+        Map<String, String> characterClasses = info.characterClasses;
+        Map<String, String> tokens = info.tokens;
 
         Grammar regexRules = createRegexRules();
         ParseTable parseTable = regexRules.createParseTable();
@@ -85,41 +82,46 @@ public class Main {
         createNFAs(classesParseTrees);
         createNFAs(tokensParseTrees);
 
-        Map<NFA, String> tokenNFAs = new HashMap<NFA, String>();
-        for (String token : tokensParseTrees.keySet()) {
-            tokenNFAs.put(nfas.get(token), token.substring(1));
+        List<NamedDFA> dfas = new ArrayList<NamedDFA>();
+        for (String tokenNames : info.tokenList) {
+            dfas.add(NamedDFA.createFromNFA(tokenNames, nfas.get(tokenNames)));
         }
-        LabelledDFA ldfa = LabelledDFA.createFromNFAs(tokenNFAs);
 
         File inputFile = new File(pathToInput);
 
-        Reader r = new InputStreamReader(new FileInputStream(inputFile), Charset.defaultCharset());
+        String inputString = "";
+        Scanner scanner = new Scanner(inputFile);
+        while (scanner.hasNextLine()) {
+            inputString += scanner.nextLine();
+        }
 
-        List<MultiToken> inputTokens = parseInput(ldfa, r);
-        for (MultiToken token : inputTokens) {
+        List<Token> inputTokens = parseInput(dfas, inputString);
+        for (Token token : inputTokens) {
             System.out.println(token);
         }
+
+        Scanner grammarScanner = new Scanner(new File(pathToGrammar));
+        Grammar grammar = new GrammarParser().parse(grammarScanner, dfas);
+        System.out.println(grammar);
+        ParseTable table = grammar.createParseTable();
+        table.parse(inputTokens, grammar.getStartRule());
+
         return "";
 	}
 
-    private List<MultiToken> parseInput(LabelledDFA ldfa, Reader r) throws IOException {
-        List<MultiToken> tokens = new ArrayList<MultiToken>();
-        String buffer = "";
-        int val = r.read();
-        while (val != -1) {
-            char c = (char) val;
-            Set<Integer> statuses = ldfa.next(c);
-
-            if (statuses.contains(LabelledDFA.TOKEN_END)) {
-                tokens.add(new MultiToken(ldfa.getLastToken(), buffer));
-                buffer = "";
+    private List<Token> parseInput(List<NamedDFA> dfas, String input) throws IOException {
+        List<Token> tokens = new ArrayList<Token>();
+        while (!input.isEmpty()) {
+            String token = null;
+            for (NamedDFA dfa : dfas) {
+                NamedDFA.Output output = dfa.run(input);
+                if (output != null) {
+                    token = output.token;
+                    tokens.add(new Token(dfa.getName(), token));
+                    input = input.substring(output.offset).trim();
+                    break;
+                }
             }
-
-            if (statuses.contains(LabelledDFA.REGALAR)) {
-                buffer += c;
-            }
-
-            val = r.read();
         }
         return tokens;
     }

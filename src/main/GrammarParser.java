@@ -8,6 +8,7 @@ import main.grammar.Production;
 import main.grammar.Rule;
 import main.grammar.Terminal;
 import main.grammar.Token;
+import main.parse.NamedDFA;
 
 import java.util.ArrayList;
 import java.util.Arrays;
