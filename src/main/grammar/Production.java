@@ -64,7 +64,7 @@ public class Production {
 	public String toString() {
 		String s = "";
 		for (Symbol symbol : symbols) {
-			s += symbol.toString();
+			s += symbol.toString() + " ";
 		}
 		return s;
 	}

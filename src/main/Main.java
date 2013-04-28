@@ -5,6 +5,7 @@ import main.grammar.Grammar;
 import main.grammar.Production;
 import main.grammar.Rule;
 import main.grammar.Terminal;
+import main.grammar.Token;
 import main.parse.ParseNode;
 import main.parse.ParseTable;
 import main.parse.ParseTree;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 public class Main {
@@ -59,14 +61,12 @@ public class Main {
         pathToTokenSpec = args[1];
 		pathToInput = args[2];
 
-		// Input and scan the grammar file
-		Map<String, String>[] mapList = new Map[2];
 		// Parse the classes and then the tokens
 		TokenParser initParse = new TokenParser();
-		mapList = initParse.parse(pathToTokenSpec, pathToInput);
+		TokenParser.TokenInfo info = initParse.parse(pathToTokenSpec, pathToInput);
 
-        Map<String, String> characterClasses = mapList[0];
-        Map<String, String> tokens = mapList[1];
+        Map<String, String> characterClasses = info.characterClasses;
+        Map<String, String> tokens = info.tokens;
 
         Grammar regexRules = createRegexRules();
         ParseTable parseTable = regexRules.createParseTable();
@@ -90,20 +90,28 @@ public class Main {
             tokenNFAs.put(nfas.get(token), token.substring(1));
         }
         LabelledDFA ldfa = LabelledDFA.createFromNFAs(tokenNFAs);
+        ldfa.setTokenPriority(info.tokenList);
 
         File inputFile = new File(pathToInput);
 
         Reader r = new InputStreamReader(new FileInputStream(inputFile), Charset.defaultCharset());
 
-        List<MultiToken> inputTokens = parseInput(ldfa, r);
-        for (MultiToken token : inputTokens) {
-            System.out.println(token);
+        List<Token> inputTokens = parseInput(ldfa, r);
+        for (Token token : inputTokens) {
+            System.out.println(token.toLongString());
         }
+
+        Grammar grammar = new GrammarParser().parse(new Scanner(new File(pathToGrammar)), null, ldfa);
+        System.out.println(grammar);
+
+        ParseTree tree = grammar.createParseTable().parse(inputTokens, grammar.getStartRule());
+        System.out.println(tree);
+
         return "";
 	}
 
-    private List<MultiToken> parseInput(LabelledDFA ldfa, Reader r) throws IOException {
-        List<MultiToken> tokens = new ArrayList<MultiToken>();
+    private List<Token> parseInput(LabelledDFA ldfa, Reader r) throws IOException {
+        List<Token> tokens = new ArrayList<Token>();
         String buffer = "";
         int val = r.read();
         while (val != -1) {
@@ -111,7 +119,7 @@ public class Main {
             Set<Integer> statuses = ldfa.next(c);
 
             if (statuses.contains(LabelledDFA.TOKEN_END)) {
-                tokens.add(new MultiToken(ldfa.getLastToken(), buffer));
+                tokens.add(new Token(ldfa.getLastToken(), buffer));
                 buffer = "";
             }
 

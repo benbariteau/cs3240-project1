@@ -13,7 +13,8 @@ public class LabelledDFA {
     DFA dfa;
     Map<State, Set<String>> acceptMap;
     State currentState;
-    private Set<String> lastToken;
+    private String lastToken;
+    Map<String, Integer> tokenPriority;
 
     public static final int NON_TOKEN_WHITESPACE = 0;
     public static final int TOKEN_END = 1;
@@ -22,6 +23,30 @@ public class LabelledDFA {
     public LabelledDFA() {
         dfa = null;
         acceptMap = new HashMap<State, Set<String>>();
+    }
+
+    public void setTokenPriority(List<String> tokens) {
+        tokenPriority = new HashMap<String, Integer>();
+        for (int i = 0; i < tokens.size(); i++) {
+            tokenPriority.put(tokens.get(i), i);
+        }
+    }
+
+    public String run(String s) {
+        currentState = dfa.startState;
+        for (int i = 0; i < s.length(); i++) {
+            Set<Integer> status = next(s.charAt(i));
+            if (status.contains(TOKEN_END)) {
+                if (i == 0 && s.length() == 1) {
+                    return s;
+                }
+                return s.substring(0, i);
+            }
+        }
+        if (next('\0').contains(TOKEN_END)) {
+            return s.substring(0);
+        }
+        return null;
     }
 
     public Set<Integer> next(char c) {
@@ -36,7 +61,7 @@ public class LabelledDFA {
 
         if (nextState == null) {
             if (currentState != dfa.startState) {
-                lastToken = acceptMap.get(currentState);
+                lastToken = findPriorityToken(acceptMap.get(currentState));
                 statuses.add(TOKEN_END);
             }
 
@@ -52,6 +77,26 @@ public class LabelledDFA {
             statuses.add(REGALAR);
         }
         return statuses;
+    }
+
+    private String findPriorityToken(Set<String> strings) {
+        String priorityToken = null;
+        for (String s : strings) {
+            if (priorityToken == null) {
+                priorityToken = s;
+            } else if (getTokenPriority(priorityToken) > getTokenPriority(s)) {
+                priorityToken = s;
+            }
+        }
+        return priorityToken;
+    }
+
+    private int getTokenPriority(String token) {
+        Integer priority = tokenPriority.get(token);
+        if (priority == null) {
+            priority = tokenPriority.get("$" + token);
+        }
+        return priority;
     }
 
     public static LabelledDFA createFromNFAs(Map<NFA, String> nfas) {
@@ -148,7 +193,7 @@ public class LabelledDFA {
         }
     }
 
-    public Set<String> getLastToken() {
+    public String getLastToken() {
         return lastToken;
     }
 }
