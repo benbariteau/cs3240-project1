@@ -2,10 +2,12 @@ package main.parse;
 
 import main.grammar.EmptyString;
 import main.grammar.EndOfInput;
+import main.grammar.MultiToken;
 import main.grammar.Production;
 import main.grammar.Rule;
 import main.grammar.Symbol;
 import main.grammar.Terminal;
+import main.grammar.Token;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -26,13 +28,17 @@ public class ParseTable {
 		this.table = table;
 	}
 
+
+    public ParseTree parse(String input, Rule startVariable) {
+        return parse(stringToSymbolList(input), startVariable);
+    }
+
 	/**
 	 * Parse the input string
 	 */
-	public ParseTree parse(String input, Rule startVariable) {
+	public ParseTree parse(List<? extends Symbol> inputSymbols, Rule startVariable) {
 		ParseTree tree = new ParseTree(startVariable);
 
-		List<Symbol> inputSymbols = stringToSymbolList(input);
 		Deque<ParseNode> parseStack = new ArrayDeque<ParseNode>();
 		parseStack.push(new ParseNode(new EndOfInput()));
 		parseStack.push(tree.getHead());

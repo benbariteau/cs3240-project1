@@ -30,15 +30,15 @@ public class GrammarParser {
         nameRuleMap = new HashMap<String, Rule>();
     }
 
-    public Grammar parse(Scanner s, Map<String, DfaRule> dfaRules, LabelledDFA tokenRecognizer) {
+    public Grammar parse(Scanner s, List<NamedDFA> dfas) {
         while (s.hasNextLine()) {
-            Rule r = parseRule(s.nextLine(), dfaRules, tokenRecognizer);
+            Rule r = parseRule(s.nextLine(), dfas);
             grammar.addRule(r);
         }
         return grammar;
     }
 
-    private Rule parseRule(String s, Map<String, DfaRule> dfaRules, LabelledDFA tokenRecognizer) {
+    private Rule parseRule(String s, List<NamedDFA> dfas) {
         Pattern p = Pattern.compile("<[^ ]+>");
         Matcher m = p.matcher(s);
         m.find();
@@ -47,7 +47,7 @@ public class GrammarParser {
 
         String rest = s.substring(m.end());
         rest = removeGrammarAssignment(rest);
-        List<Production> productions = getProductions(rest, dfaRules, tokenRecognizer);
+        List<Production> productions = getProductions(rest, dfas);
         r.addProductions(productions);
 
         return r;
@@ -55,52 +55,54 @@ public class GrammarParser {
 
     private static Set<Character> token_id_chars = new HashSet<Character>(Arrays.asList('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'X', 'Y', 'Z', '-', '_'));
 
-    private List<Production> getProductions(String s, Map<String, DfaRule> dfaRules, LabelledDFA tokenRecognizer) {
+    private List<Production> getProductions(String s, List<NamedDFA> dfas) {
         List<Production> productions = new ArrayList<Production>();
-        char[] productionListChars = s.toCharArray();
 
         Production production = new Production();
-        for (int i = 0; i < productionListChars.length; i++) {
-            char c = productionListChars[i];
+        while (!s.isEmpty()) {
+            char c = s.charAt(0);
+            int i;
             switch (c) {
                 case '<':
-                    if (s.length() >= i+9 && s.substring(i, i+9).equals("<epsilon>")) {
+                    if (s.length() >= 9 && s.substring(0, 9).equals("<epsilon>")) {
                         production.add(new EmptyString());
-                        i +=10;
+                        s = s.length() > 10 ? s.substring(10).trim() : "";
                     } else {
                         String ruleName = "";
-                        for (; productionListChars[i] != '>'; i++) {
-                            ruleName += productionListChars[i];
+                        for (i = 0; s.charAt(i) != '>'; i++) {
+                            ruleName += s.charAt(i);
                         }
                         ruleName += '>';
                         Rule r = getOrCreateRule(ruleName);
                         production.add(r);
+                        s = s.substring(i+1).trim();
                     }
                     break;
                 case '|':
                     productions.add(production);
                     production = new Production();
+                    s = s.substring(1).trim();
                     break;
                 case 'A':
                 case 'I':
                 case 'R':
                     String ruleName = "$";
-                    for (; i < productionListChars.length && token_id_chars.contains(productionListChars[i]); i++) {
-                        ruleName += productionListChars[i];
+                    for (i = 0; i < s.length() && token_id_chars.contains(s.charAt(i)) ;i++) {
+                        ruleName += s.charAt(i);
                     }
-                    DfaRule r = dfaRules.get(ruleName);
-                    production.add(r);
+                    Token token = new Token(ruleName, "");
+                    s = s.substring(i).trim();
+                    production.add(token);
                     break;
                 default:
-                    String st = "";
-                    for (; i < productionListChars.length; i++) {
-                        c = productionListChars[i];
-                        Set<Integer> status = tokenRecognizer.next(c);
-                        if (status.contains(LabelledDFA.TOKEN_END)) {
-                            production.add(new MultiToken(tokenRecognizer.getLastToken(), st));
+                    String tokenName = null;
+                    for (NamedDFA dfa : dfas) {
+                        NamedDFA.Output output = dfa.run(s);
+                        if (output != null) {
+                            s = s.substring(output.offset).trim();
+                            production.add(new Token(dfa.getName(), output.token));
                             break;
                         }
-                        st += c;
                     }
                     break;
             }

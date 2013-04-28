@@ -1,5 +1,6 @@
 package main.grammar;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class Token implements Symbol {
@@ -13,7 +14,9 @@ public class Token implements Symbol {
 
     @Override
     public Set<Symbol> getFirstSet() {
-        return null;
+        Set<Symbol> first = new HashSet<Symbol>();
+        first.add(this);
+        return first;
     }
 
     public String toString() {
@@ -28,15 +31,12 @@ public class Token implements Symbol {
         Token token = (Token) o;
 
         if (!name.equals(token.name)) return false;
-        if (value != null ? !value.equals(token.value) : token.value != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + (value != null ? value.hashCode() : 0);
-        return result;
+        return name.hashCode();
     }
 }

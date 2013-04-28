@@ -104,7 +104,8 @@ public class Main {
         Grammar grammar = new GrammarParser().parse(grammarScanner, dfas);
         System.out.println(grammar);
         ParseTable table = grammar.createParseTable();
-        table.parse(inputTokens, grammar.getStartRule());
+        ParseTree parseTree = table.parse(inputTokens, grammar.getStartRule());
+        System.out.println(parseTree);
 
         return "";
 	}
@@ -112,11 +113,10 @@ public class Main {
     private List<Token> parseInput(List<NamedDFA> dfas, String input) throws IOException {
         List<Token> tokens = new ArrayList<Token>();
         while (!input.isEmpty()) {
-            String token = null;
             for (NamedDFA dfa : dfas) {
                 NamedDFA.Output output = dfa.run(input);
                 if (output != null) {
-                    token = output.token;
+                    String token = output.token;
                     tokens.add(new Token(dfa.getName(), token));
                     input = input.substring(output.offset).trim();
                     break;
