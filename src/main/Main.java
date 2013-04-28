@@ -1,5 +1,7 @@
 package main;
 
+import main.exception.UnrecognizedTokenException;
+import main.exception.UnexpectedSymbolException;
 import main.grammar.EmptyString;
 import main.grammar.Grammar;
 import main.grammar.Production;
@@ -41,7 +43,13 @@ public class Main {
     Map<String, ParseTree> tokensParseTrees = new HashMap<String, ParseTree>();
 
     public static void main(String[] args) throws IOException {
-        System.out.println(new Main().run(args));
+        try {
+            System.out.println(new Main().run(args));
+        } catch (UnexpectedSymbolException e) {
+            e.printMessage(System.out);
+        } catch (UnrecognizedTokenException e) {
+            e.printMessage(System.out);
+        }
     }
 
 	/*
@@ -51,7 +59,7 @@ public class Main {
 	 * 
 	 * @arg[1] Input
 	 */
-	public String run(String[] args) throws IOException {
+	public String run(String[] args) throws IOException, UnexpectedSymbolException, UnrecognizedTokenException {
 
 		// Ensure proper input parameters
 		inputValidation(args);
@@ -110,13 +118,19 @@ public class Main {
         return "";
 	}
 
-    private List<Token> parseInput(LabelledDFA ldfa, Reader r) throws IOException {
+    private List<Token> parseInput(LabelledDFA ldfa, Reader r) throws IOException, UnrecognizedTokenException {
         List<Token> tokens = new ArrayList<Token>();
         String buffer = "";
         int val = r.read();
         while (val != -1) {
             char c = (char) val;
-            Set<Integer> statuses = ldfa.next(c);
+
+            Set<Integer> statuses = null;
+            try {
+                statuses = ldfa.next(c);
+            } catch (UnrecognizedTokenException e) {
+                throw new UnrecognizedTokenException(buffer, buffer.length()-1);
+            }
 
             if (statuses.contains(LabelledDFA.TOKEN_END)) {
                 tokens.add(new Token(ldfa.getLastToken(), buffer));

@@ -23,6 +23,10 @@ public class Token implements Symbol {
         return name;
     }
 
+    public String getValue() {
+        return value;
+    }
+
     public String toLongString() {
         return name + "( " + value + " )";
     }

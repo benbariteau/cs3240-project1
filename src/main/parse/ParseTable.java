@@ -1,5 +1,7 @@
 package main.parse;
 
+import main.exception.UnexpectedSymbolException;
+import main.exception.UnrecognizedTokenException;
 import main.grammar.EmptyString;
 import main.grammar.EndOfInput;
 import main.grammar.Production;
@@ -26,14 +28,14 @@ public class ParseTable {
 		this.table = table;
 	}
 
-    public ParseTree parse(String input, Rule startVariable) {
+    public ParseTree parse(String input, Rule startVariable) throws UnexpectedSymbolException {
         return parse(stringToSymbolList(input), startVariable);
     }
 
 	/**
 	 * Parse the input string
 	 */
-	public ParseTree parse(List<? extends Symbol> inputSymbols, Rule startVariable) {
+	public ParseTree parse(List<? extends Symbol> inputSymbols, Rule startVariable) throws UnexpectedSymbolException {
 		ParseTree tree = new ParseTree(startVariable);
 
 		Deque<ParseNode> parseStack = new ArrayDeque<ParseNode>();
@@ -49,6 +51,10 @@ public class ParseTable {
 				Production p = table.get(topSymbol).get(first);
 				parseStack.pop();
 
+                if(p == null) {
+                    throw new UnexpectedSymbolException(table.get(topSymbol).keySet(), first);
+                }
+
 				List<ParseNode> parseNodes = p.getParseNodes();
 
 				top.addChildren(parseNodes);
@@ -63,7 +69,9 @@ public class ParseTable {
 				if (first.equals(topSymbol)) {
 					parseStack.pop();
 					inputSymbols.remove(0);
-				}
+				} else {
+                    throw new UnexpectedSymbolException(topSymbol, first);
+                }
 			}
 		}
 		return tree;

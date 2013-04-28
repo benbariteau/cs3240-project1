@@ -11,6 +11,8 @@ import java.util.Scanner;
 
 import main.Main;
 
+import main.exception.UnrecognizedTokenException;
+import main.exception.UnexpectedSymbolException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -135,7 +137,7 @@ public class InvalidTestSuite {
 	 * A single correct run
 	 */
 	@Test
-	public void test_all() throws IOException {
+	public void test_all() throws IOException, UnexpectedSymbolException, UnrecognizedTokenException {
 		String s = new Main().run(new String[] { pathGrammar, pathInput });
         System.out.println(s);
         assertFalse(s.equals(textOutput));

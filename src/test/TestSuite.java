@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
+import main.exception.UnrecognizedTokenException;
+import main.exception.UnexpectedSymbolException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -103,5 +105,5 @@ public abstract class TestSuite {
 	 * A single correct run
 	 */
 	@Test
-	public abstract void test_all() throws IOException;
+	public abstract void test_all() throws IOException, UnexpectedSymbolException, UnrecognizedTokenException;
 }

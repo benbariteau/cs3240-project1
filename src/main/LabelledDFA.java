@@ -1,6 +1,6 @@
 package main;
 
-import main.grammar.Token;
+import main.exception.UnrecognizedTokenException;
 
 import java.io.FileWriter;
 import java.util.HashMap;
@@ -32,24 +32,29 @@ public class LabelledDFA {
         }
     }
 
-    public String run(String s) {
+    public String run(String s) throws UnrecognizedTokenException {
         currentState = dfa.startState;
-        for (int i = 0; i < s.length(); i++) {
-            Set<Integer> status = next(s.charAt(i));
-            if (status.contains(TOKEN_END)) {
-                if (i == 0 && s.length() == 1) {
-                    return s;
+        int i = 0;
+        try {
+            for (i = 0; i < s.length(); i++) {
+                Set<Integer> status = next(s.charAt(i));
+                if (status.contains(TOKEN_END)) {
+                    if (i == 0 && s.length() == 1) {
+                        return s;
+                    }
+                    return s.substring(0, i);
                 }
-                return s.substring(0, i);
             }
-        }
-        if (next('\0').contains(TOKEN_END)) {
-            return s.substring(0);
+            if (next('\0').contains(TOKEN_END)) {
+                return s.substring(0);
+            }
+        } catch (UnrecognizedTokenException e) {
+            throw new UnrecognizedTokenException(s, i);
         }
         return null;
     }
 
-    public Set<Integer> next(char c) {
+    public Set<Integer> next(char c) throws UnrecognizedTokenException {
         if (currentState == null) {
             currentState = dfa.startState;
         }
@@ -61,7 +66,11 @@ public class LabelledDFA {
 
         if (nextState == null) {
             if (currentState != dfa.startState) {
-                lastToken = findPriorityToken(acceptMap.get(currentState));
+                Set<String> tokenIds = acceptMap.get(currentState);
+                if (tokenIds == null) {
+                    throw new UnrecognizedTokenException();
+                }
+                lastToken = findPriorityToken(tokenIds);
                 statuses.add(TOKEN_END);
             }
 
@@ -79,7 +88,7 @@ public class LabelledDFA {
         return statuses;
     }
 
-    private String findPriorityToken(Set<String> strings) {
+    private String findPriorityToken(Set<String> strings) throws UnrecognizedTokenException {
         String priorityToken = null;
         for (String s : strings) {
             if (priorityToken == null) {

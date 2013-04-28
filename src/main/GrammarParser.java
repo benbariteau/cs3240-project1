@@ -1,12 +1,11 @@
 package main;
 
+import main.exception.UnrecognizedTokenException;
 import main.grammar.DfaRule;
 import main.grammar.EmptyString;
 import main.grammar.Grammar;
-import main.grammar.MultiToken;
 import main.grammar.Production;
 import main.grammar.Rule;
-import main.grammar.Terminal;
 import main.grammar.Token;
 
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ public class GrammarParser {
         nameRuleMap = new HashMap<String, Rule>();
     }
 
-    public Grammar parse(Scanner s, Map<String, DfaRule> dfaRules, LabelledDFA tokenRecognizer) {
+    public Grammar parse(Scanner s, Map<String, DfaRule> dfaRules, LabelledDFA tokenRecognizer) throws UnrecognizedTokenException {
         while (s.hasNextLine()) {
             Rule r = parseRule(s.nextLine(), dfaRules, tokenRecognizer);
             grammar.addRule(r);
@@ -37,7 +36,7 @@ public class GrammarParser {
         return grammar;
     }
 
-    private Rule parseRule(String s, Map<String, DfaRule> dfaRules, LabelledDFA tokenRecognizer) {
+    private Rule parseRule(String s, Map<String, DfaRule> dfaRules, LabelledDFA tokenRecognizer) throws UnrecognizedTokenException {
         Pattern p = Pattern.compile("<[^ ]+>");
         Matcher m = p.matcher(s);
         m.find();
@@ -54,7 +53,7 @@ public class GrammarParser {
 
     private static Set<Character> token_id_chars = new HashSet<Character>(Arrays.asList('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'X', 'Y', 'Z', '-', '_'));
 
-    private List<Production> getProductions(String s, Map<String, DfaRule> dfaRules, LabelledDFA tokenRecognizer) {
+    private List<Production> getProductions(String s, Map<String, DfaRule> dfaRules, LabelledDFA tokenRecognizer) throws UnrecognizedTokenException {
         List<Production> productions = new ArrayList<Production>();
 
         Production production = new Production();

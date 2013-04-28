@@ -8,6 +8,8 @@ import java.util.Collection;
 
 import main.Main;
 
+import main.exception.UnrecognizedTokenException;
+import main.exception.UnexpectedSymbolException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -62,7 +64,7 @@ public class ValidTestSuite extends TestSuite {
 	 * A single correct run
 	 */
 	@Test
-	public void test_all() throws IOException {
+	public void test_all() throws IOException, UnexpectedSymbolException, UnrecognizedTokenException {
 		String s = new Main().run(new String[] { this.pathGrammar, this.pathInput });
         System.out.println(s);
         assertTrue(s.equals(textOutput));
