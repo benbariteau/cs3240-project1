@@ -12,10 +12,12 @@ import main.parse.ParseNode;
 import main.parse.ParseTable;
 import main.parse.ParseTree;
 
+import javax.swing.plaf.synth.SynthTabbedPaneUI;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -46,11 +48,13 @@ public class Main {
         try {
             System.out.println(new Main().run(args));
         } catch (UnexpectedSymbolException e) {
-            e.printMessage(System.out);
+            e.printMessage(System.err);
         } catch (UnrecognizedTokenException e) {
-            e.printMessage(System.out);
+            e.printMessage(System.err);
         }
     }
+
+    public static PrintStream out = System.out;
 
 	/*
 	 * Main method and driver of the program
@@ -70,6 +74,7 @@ public class Main {
 		pathToInput = args[2];
 
 		// Parse the classes and then the tokens
+        System.out.println("Reading token spec");
 		TokenParser initParse = new TokenParser();
 		TokenParser.TokenInfo info = initParse.parse(pathToTokenSpec, pathToInput);
 
@@ -79,16 +84,19 @@ public class Main {
         Grammar regexRules = createRegexRules();
         ParseTable parseTable = regexRules.createParseTable();
 
+        System.out.println("Parsing character classes");
         for(String key : characterClasses.keySet()) {
             ParseTree parseTree = parseTable.parse(characterClasses.get(key), regexRules.getStartRule());
             classesParseTrees.put(key, parseTree);
         }
 
+        System.out.println("Parsing token classes");
         for(String key : tokens.keySet()) {
             ParseTree parseTree = parseTable.parse(tokens.get(key), regexRules.getStartRule());
             tokensParseTrees.put(key, parseTree);
         }
 
+        System.out.println("Creating token spec NFAs");
         //Create basic NFAs for each class and token
         createNFAs(classesParseTrees);
         createNFAs(tokensParseTrees);
@@ -97,6 +105,7 @@ public class Main {
         for (String token : tokensParseTrees.keySet()) {
             tokenNFAs.put(nfas.get(token), token.substring(1));
         }
+        System.out.println("Creating token recognizer");
         LabelledDFA ldfa = LabelledDFA.createFromNFAs(tokenNFAs);
         ldfa.setTokenPriority(info.tokenList);
 
@@ -104,16 +113,17 @@ public class Main {
 
         Reader r = new InputStreamReader(new FileInputStream(inputFile), Charset.defaultCharset());
 
+        System.out.println("Tokenizing input");
         List<Token> inputTokens = parseInput(ldfa, r);
-        for (Token token : inputTokens) {
-            System.out.println(token.toLongString());
-        }
 
+        System.out.println("Reading grammar");
         Grammar grammar = new GrammarParser().parse(new Scanner(new File(pathToGrammar)), null, ldfa);
-        System.out.println(grammar);
 
+        System.out.println("Parsing input");
         ParseTree tree = grammar.createParseTable().parse(inputTokens, grammar.getStartRule());
-        System.out.println(tree);
+        if (!tree.toString().isEmpty()) {
+            out.println("Accepted! Valid Input!");
+        }
 
         return "";
 	}
