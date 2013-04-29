@@ -40,7 +40,7 @@ public abstract class TestSuite {
 	 */
 	@Before
 	public void setUp() {
-		System.out.println("Files:");
+		//System.out.println("Files:");
 		// Get the files ready
 		setUpFiles();
 		// Display file information
@@ -62,11 +62,11 @@ public abstract class TestSuite {
 	 * Display all the file names and checks contents
 	 */
 	private void display() {
-		System.out.println(fileGrammar.getAbsolutePath());
-		System.out.println(fileInput.getAbsolutePath());
-		System.out.println(fileOutput.getAbsolutePath());
-		System.out.println(fileScript.getAbsolutePath());
-		System.out.println(fileSpec.getAbsolutePath() + "\n");
+//		System.out.println(fileGrammar.getAbsolutePath());
+//		System.out.println(fileInput.getAbsolutePath());
+//		System.out.println(fileOutput.getAbsolutePath());
+//		System.out.println(fileScript.getAbsolutePath());
+//		System.out.println(fileSpec.getAbsolutePath() + "\n");
 		textOutput = displayFile(fileOutput);
 	}
 
@@ -93,7 +93,7 @@ public abstract class TestSuite {
 			text += line + System.getProperty("line.separator");
 		}
 		// Print the final string which represents the sum file contents
-		System.out.println(file.getName() + ":\n" + text);
+//		System.out.println(file.getName() + ":\n" + text);
 		scanner.close();
         return text;
 	}
