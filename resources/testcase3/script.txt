@@ -6,5 +6,13 @@ x = maxfreqstring(matches);
 y = x;
 print (y);
 print (find 'a' in "input1.txt");
+replace '([A-Za-z])*ment' with "" in "input1.txt" >! "output1.txt";
+matches_prime = (((((find '([A-Z a-z])*ment([A-Z a-z])*' in "input1.txt" diff find '(A|a) ([A-Z a-z])*' in "input2.txt")))));
+n_matches_prime = #matches_prime;
+print (n_matches_prime, matches_prime);
+x_prime = maxfreqstring(matches_prime);
+y_prime = x_prime;
+print (y_prime);
+print (find 'a' in "input1.txt");
 replace '([A-Za-z])*ment' with "" in "input1.txt" >! "output1.txt";   
 end
