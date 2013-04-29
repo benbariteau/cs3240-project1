@@ -1,5 +1,0 @@
-%% Camment
-$DANG [A-Z]
-$DIGIT [a-z]
-
-$COW $DANG | $DIGIT
